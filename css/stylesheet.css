@@ -1,0 +1,18 @@
+body
+{
+    background: url(../media/background.png) no-repeat center center fixed;
+    background-position: top;
+    background-attachment: fixed;
+    background-size: cover;
+}
+.test
+{
+    color:white;
+}
+div
+{
+   
+    margin-top:50px;
+    height:25px;
+    
+}

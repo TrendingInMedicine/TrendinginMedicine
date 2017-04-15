@@ -1,4 +1,4 @@
-// #!/usr/bin/nodejs 
+// #!/usr/bin/nodejs
 // ABOVE LINE FOR TJ SERVER
 
 var express = require('express');
@@ -32,19 +32,20 @@ var snowshal = 0;
 var count = db.ref("count");
 count.on("value", function(snapshot)
 {
-	console.log(snapshot.val()["vistors"]);	
+	console.log(snapshot.val()["vistors"]);
 	snowshal = snapshot.val()["vistors"];
 
 });
 
 app.set('port', process.env.PORT || 8080);
 
-app.get('/', function(req, res) {	
+app.get('/', function(req, res) {
 	console.log("User:");
 	count.set({
 		"vistors": snowshal+1
 	});
-	var body = "Visitors: " + snowshal;
+	//var body = "Visitors: " + snowshal;
+  var body = "Trending in Medicine";
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Content-Length', body.length);
     res.end(body);

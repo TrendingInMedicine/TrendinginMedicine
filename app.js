@@ -45,11 +45,11 @@ app.get('/', function(req, res) {
 		"vistors": snowshal+1
 	});
 	//var body = "Visitors: " + snowshal;
-  var body = "Trending in Medicine";
-    res.setHeader('Content-Type', 'text/plain');
-    res.setHeader('Content-Length', body.length);
-    res.end(body);
-    // res.sendFile(path.join(__dirname + '/index.html'));
+  // var body = "Trending in Medicine";
+  //   res.setHeader('Content-Type', 'text/plain');
+  //   res.setHeader('Content-Length', body.length);
+  //   res.end(body);
+    res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.get('/index', function(req, res) {

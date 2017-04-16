@@ -10,14 +10,7 @@ var app = express();
 app.use("/css",  express.static(__dirname + '/css'));
 app.use("/js", express.static(__dirname + '/js'));
 app.use("/media", express.static(__dirname + '/media'));
-
-// app.use("/Lab_1", express.static(__dirname + '/Lab_1'));
-
-// app.use("/Lab_2", express.static(__dirname + '/Lab_2'));
-
-// app.use("/Lab_3", express.static(__dirname + '/Lab_3'));
-
-// app.use("/Lab_4", express.static(__dirname + '/Lab_4'));
+app.use("/fonts", express.static(__dirname + '/fonts'));
 
 var admin = require("firebase-admin");
 var serviceAccount = require(__dirname + '/serviceAccountKey.json');

@@ -33,15 +33,6 @@ count.on("value", function(snapshot)
 app.set('port', process.env.PORT || 8080);
 
 app.get('/', function(req, res) {
-	console.log("User:");
-	count.set({
-		"vistors": snowshal+1
-	});
-	//var body = "Visitors: " + snowshal;
-  // var body = "Trending in Medicine";
-  //   res.setHeader('Content-Type', 'text/plain');
-  //   res.setHeader('Content-Length', body.length);
-  //   res.end(body);
     res.sendFile(path.join(__dirname + '/index.html'));
 });
 

@@ -20,6 +20,7 @@ admin.initializeApp({
   databaseURL: "https://trendinginmedicine-f41fc.firebaseio.com"
 });
 
+//how to firebase:
 // var db = admin.database();
 // var snowshal = 0;
 // var count = db.ref("count");

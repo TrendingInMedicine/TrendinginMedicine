@@ -17,7 +17,7 @@ var serviceAccount = require(__dirname + '/serviceAccountKey.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://trendinginmedicine-f41fc.firebaseio.com"
+  databaseURL: "https://heroku-5b3a3.firebaseio.com"
 });
 
 var db = admin.database();

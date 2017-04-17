@@ -24,7 +24,7 @@
 
   <!-- Javascript-->
   <script src="js/login_register.js" type="text/javascript"></script>
-
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 </head>
 
@@ -132,7 +132,7 @@
 
   <!-- Carousel
   ================================================== -->
-  <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="5000">
+  <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="7000">
 
     <!-- Indicators -->
     <ol class="carousel-indicators">
@@ -185,7 +185,7 @@
 
         <div class="field field-name-field-highlight-image field-type-image field-label-hidden ">
           <picture>
-            <img  src= "/media/cartoon1.png" alt="" title="" style="width:200px;height:200px;" />
+            <img  src= "/media/cartoon1.png" alt="" title="" style="width:200px;height:200px;"></img>
           </picture>
         </div>
 
@@ -198,7 +198,7 @@
 
         <div class="field field-name-field-highlight-image field-type-image field-label-hidden ">
           <picture>
-            <img  src= "/media/cartoon2.png" alt="" title="" style="width:200px;height:200px;" />
+            <img  src= "/media/cartoon2.png" alt="" title="" style="width:200px;height:200px;"></img>
           </picture>
         </div>
 
@@ -211,52 +211,59 @@
 
         <div class="field field-name-field-highlight-image field-type-image field-label-hidden ">
           <picture>
-            <img  src= "/media/cartoon3.png" alt="" title="" style="width:200px;height:200px;" />
+            <img  src= "/media/cartoon3.png" alt="" title="" style="width:200px;height:200px;"></img>
           </picture>
         </div>
 
 
       </div>
     </div>
+  </div>
 
 
 
-
-
-
-
-
-
-
-
-    <hr style = "margin-bottom:100px; margin-top:50px;">
+    <hr style = "margin-top:50px;">
 
     <!-- anjams pane
       <div class="panel-separator"></div>-->
 
-      <div class = "container" style = "background-color:#d9d9d9;">
+      <div class = "container-fluid" style = "background-color:#d9d9d9; padding: 6em 4em 2em;">
         <div class="panel-pane pane-fieldable-panels-pane pane-fpid-806 jumbo-img-row is-striped stay-on-top pane-bundle-mint-image-block view-mode-full-width-image-right" style = "background-color:#d9d9d9;">
           <div class="pane-content">
             <div class="container">
               <div class="row">
+
                 <div class="fieldable-panels-pane">
+
+
                   <div class="group-content-left field-group-div col-md-6">
                     <div class="field field-name-field-block-text field-type-text-long field-label-hidden ">
                       <h3>Personalized for you</h3>
-                      <ul class="list-mobile no-margin-bottom">
+                      <ul class="list-mobile no-margin-bottom" style="line-height:2.5;">
                         <li>Sign up or stay logged in to get recommended trends and articles daily.</li>
                         <li>Have updates on trends emailed and texted to your smartphone.</li>
                         <li>Receive alerts when trends move up or down.</li>
                       </ul>
                     </div>
                   </div>
+
+
+
+                  <div class = "group-content-right field-group-div col-md-6">
+                      <div id = "myPieChart">
+                      </div>
+                  </div>
+
+
                 </div>
+
               </div>
             </div>
           </div>
         </div>
       </div>
     <!--end of anjams stuff-->
+
 
 
 
@@ -271,13 +278,47 @@
 
 
 
+
   <!-- Bootstrap core JavaScript
   ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
   <script src="js/bootstrap.min.js"></script>
+  <!-- javascript graph -->
+  <script type="text/javascript">
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
 
+    function drawChart() {
+      // Define the chart to be drawn.
+      var keyword = 'pancreatic';
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Date');
+      data.addColumn('number', 'Usage of ' + keyword);
+      data.addRows([
+        ['February', 37],
+        ['March', 42],
+        ['April', 59]
+      ]);
+
+      // Instantiate and draw the chart.
+      var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
+
+      var options = {
+          title: 'Time Trend of Word Usage',
+          width: 500,
+          height: 300,
+          chartArea: {  width: "50%", height: "70%" },
+          backgroundColor: '#d9d9d9',
+          is3D: true
+      };
+
+
+      chart.draw(data, options);
+    }
+  </script>
+  <!-- javascript graph -->
 
 
 </body>

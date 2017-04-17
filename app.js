@@ -34,11 +34,29 @@ admin.initializeApp({
 app.set('port', process.env.PORT || 8080);
 
 app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
+  res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.get('/index', function(req, res) {
-    res.sendFile(path.join(__dirname + '/index.html'));
+  res.sendFile(path.join(__dirname + '/index.html'));
+});
+
+app.get('/register', function(req, res) {
+  console.log("boshal")
+  admin.auth().createUser({
+    email: req.query['email'],
+    emailVerified: false,
+    password: req.query['password'],
+    displayName: req.query['name'],
+    disabled: false
+  })
+  .then(function(userRecord) {
+    // See the UserRecord reference doc for the contents of userRecord.
+    console.log("Successfully created new user:", userRecord.uid);
+  })
+  .catch(function(error) {
+    console.log("Error creating new user:", error);
+  });
 });
 
 var listener = app.listen(app.get('port'), function() {

@@ -36,7 +36,7 @@
 
 </head>
 
-<body>
+<body id="page-top" data-spy="scroll">
   <!-- line 4356 -->
   <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
@@ -52,7 +52,15 @@
       <div class="collapse navbar-collapse navbar-center navbar-main-collapse">
         <ul class="nav navbar-nav navbar-center">
           <li><a href = "#">Journals</a></li>
-          <li><a href = "#">#Trends</a></li>
+          <li class = "dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">#Trends
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="#">Surgery</a></li>
+              <li><a href="#">Oncology</a></li>
+              <li><a href="#">Cardiology</a></li>
+            </ul>
+          </li>
           <li><a href = "#">Team</a></li>
         </ul>
         <ul class = "nav navbar-nav navbar-right">
@@ -125,7 +133,7 @@
     <div class="text-center" style = "background-color:black; opacity: .7; color:white; padding:1em;">
       <h1 style = "font-size:5vw">#TrendingInMedicine</h1>
       <h4 style="font-weight:normal;">Twitter distills millions of tweets daily into "trends" - so that you know what today's most important discussions are & you can see all the tweets relevant to that discussion. Why aren't we doing the same with the thousands of medical papers published weekly?</h4>
-        <p><a class="btn btn-primary btn-lg" href="#" role="button"> Sign Up &raquo;</a></p>
+        <p><a class="btn btn-primary btn-lg page-scroll" href="#learn" role="button"> Learn More &raquo;</a></p>
       </div>
     </div>
   </div>
@@ -227,7 +235,7 @@
     <!-- anjams pane
       <div class="panel-separator"></div>-->
 
-      <div class = "container-fluid" style = "background-color:#ebebeb; padding: 6em 4em 2em;">
+      <div id = "learn" class = "container-fluid" style = "background-color:#ebebeb; padding: 6em 4em 2em;">
         <div class="panel-pane pane-fieldable-panels-pane pane-fpid-806 jumbo-img-row is-striped stay-on-top pane-bundle-mint-image-block view-mode-full-width-image-right">
           <div class="pane-content">
             <div class="container">
@@ -282,11 +290,19 @@
   <!-- Bootstrap core JavaScript
   ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
+  <script src="vendors/jquery/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
   <script src="js/bootstrap.min.js"></script>
   <!-- javascript graph -->
   <script type="text/javascript">
+    $(document).on('click', 'a', function(event){
+      event.preventDefault();
+
+      $('html, body').animate({
+          scrollTop: $( $.attr(this, 'href') ).offset().top
+      }, 500);
+    });
     google.charts.load('current', {packages: ['corechart']});
     google.charts.setOnLoadCallback(drawChart);
 

@@ -56,9 +56,9 @@
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">#Trends
             <span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><a href="trends.html">Surgery</a></li>
-              <li><a href="trends.html">Oncology</a></li>
-              <li><a href="trends.html">Cardiology</a></li>
+              <li><a href="/trends?topic=surgery">Surgery</a></li>
+              <li><a href="/trends?topic=oncology">Oncology</a></li>
+              <li><a href="/trends?topic=cardiology">Cardiology</a></li>
             </ul>
           </li>
           <li><a href = "/#learn"> Team </a></li>
@@ -145,44 +145,15 @@
   <!-- Bootstrap core JavaScript
   ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="vendors/jquery/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
   <script src="js/bootstrap.min.js"></script>
-  <!-- javascript graph -->
+  <!-- javascript urlParams -->
   <script type="text/javascript">
-    google.charts.load('current', {packages: ['corechart']});
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-        // Define the chart to be drawn.
-        var keyword = 'pancreatic';
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Date');
-        data.addColumn('number', 'Usage of ' + keyword);
-        data.addRows([
-          ['January', 37],
-          ['Febuary', 42],
-          ['March', 59]
-        ]);
-
-        // Instantiate and draw the chart.
-        var chart = new google.visualization.LineChart(document.getElementById('myPieChart'));
-
-        var options = {
-            title: 'Time Trend of Word Usage',
-            width: $(window).width()/2,
-            height: 200,
-            chartArea: {  width: "60%", height: "70%" },
-            backgroundColor: '#ebebeb',
-            is3D: true
-        };
-
-
-        chart.draw(data, options);
-      }
+    var urlParams = new URLSearchParams(window.location.search);
+    console.log(urlParams.get('topic'));
   </script>
-  <!-- javascript graph -->
+  <!-- javascript urlParams -->
 
 
 </body>

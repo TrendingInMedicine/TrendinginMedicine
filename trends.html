@@ -144,6 +144,7 @@
     // console.log(urlParams.get('topic'));
     var s = urlParams.get('topic');
     var s = s[0].toUpperCase() + s.slice(1);
+    document.title = "#TrendingIn" + s;
     document.getElementById('boshal').innerHTML = s;
   </script>
   <!-- javascript urlParams -->

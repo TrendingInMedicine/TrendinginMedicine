@@ -53,7 +53,7 @@
         <ul class="nav navbar-nav navbar-center">
           <li><a href = "#">Journals</a></li>
           <li class = "dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown">#Trends
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">#Trends
             <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="/trends">Surgery</a></li>
@@ -61,7 +61,7 @@
               <li><a href="/trends">Cardiology</a></li>
             </ul>
           </li>
-          <li><a href = "index.html">Team</a></li>
+          <li><a href = "#index">Team</a></li>
         </ul>
         <ul class = "nav navbar-nav navbar-right">
           <li><a href="#" data-toggle="modal" onclick="openRegisterModal();"><span class = "glyphicon glyphicon-user"></span>  Sign Up</a></li>
@@ -137,6 +137,7 @@
       </div>
     </div>
   </div>
+
   <!-- Carousel
   ================================================== -->
   <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="7000">
@@ -250,8 +251,6 @@
                         <li>Sign up or stay logged in to get recommended trends and articles daily.</li>
                         <li>Have updates on trends emailed and texted to your smartphone.</li>
                         <li>Receive alerts when trends move up or down.</li>
-                        <a href="/trends">click me</a>
-
                       </ul>
                     </div>
                   </div>
@@ -291,18 +290,21 @@
   <!-- Bootstrap core JavaScript
   ================================================== -->
   <!-- Placed at the end of the document so the pages load faster -->
-  <script src="vendors/jquery/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
-  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>\
+  <script src="js/jquery.easing.min.js"></script>
+  <script src="js/scroll.js"></script>
   <!-- javascript graph -->
   <script type="text/javascript">
-    $(document).on('click', 'a', function(event){
-      event.preventDefault();
-
-      $('html, body').animate({
-          scrollTop: $( $.attr(this, 'href') ).offset().top
-      }, 1500);
+    $(function() {
+      $('a.page-scroll').bind('click', function(event) {
+          var $anchor = $(this);
+          $('html, body').stop().animate({
+              scrollTop: $($anchor.attr('href')).offset().top
+          }, 1500, 'easeInOutExpo');
+          event.preventDefault();
+      });
     });
     google.charts.load('current', {packages: ['corechart']});
     google.charts.setOnLoadCallback(drawChart);

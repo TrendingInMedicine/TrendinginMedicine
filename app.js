@@ -41,6 +41,10 @@ app.get('/index', function(req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+app.get('/trends', function(req, res) {
+  res.sendFile(path.join(__dirname + '/trends.html'));
+});
+
 app.get('/register', function(req, res) {
   console.log("boshal")
   admin.auth().createUser({

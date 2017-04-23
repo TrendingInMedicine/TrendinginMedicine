@@ -10,7 +10,7 @@
   <meta name="author" content="">
   <link rel="icon" href="favicon.ico">
 
-  <title>#TrendingInMedicine</title>
+  <title>Loading...</title>
 
   <!-- Bootstrap core CSS -->
   <link href="css/bootstrap.css" rel="stylesheet">
@@ -143,9 +143,14 @@
     var urlParams = new URLSearchParams(window.location.search);
     // console.log(urlParams.get('topic'));
     var s = urlParams.get('topic');
-    var s = s[0].toUpperCase() + s.slice(1);
+    if (s == null) {
+      s = "Medicine";
+    }
+    else {
+      var s = s[0].toUpperCase() + s.slice(1);
+      document.getElementById('boshal').innerHTML = s;
+    }
     document.title = "#TrendingIn" + s;
-    document.getElementById('boshal').innerHTML = s;
   </script>
   <!-- javascript urlParams -->
 </body>

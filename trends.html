@@ -123,8 +123,18 @@
       </div>
     </div>
   </div>
-  <div class = "container" style = "margin-top:90px;">
-    <h1 id = "boshal"></h1>
+
+
+
+  <div class = "container" style = "margin-top:90px; margin-bottom:100px;">
+
+
+    <div id = "boshal">
+
+    </div>
+
+
+
     <hr>
     <footer>
       <p>&copy; 2017 TrendinginMedicine.</p>
@@ -148,7 +158,21 @@
     }
     else {
       var s = s[0].toUpperCase() + s.slice(1);
-      document.getElementById('boshal').innerHTML = s;
+
+
+
+      var myDiv = document.getElementById('boshal');
+            var h1 = document.createElement("h1");
+            var t = document.createTextNode(s);
+            h1.appendChild(t);
+            var p = document.createElement("p");
+            var t = document.createTextNode("foshal");
+            p.appendChild(t);
+            myDiv.appendChild(h1);
+            myDiv.appendChild(p);
+
+
+
     }
     document.title = "#TrendingIn" + s;
   </script>

@@ -4,14 +4,18 @@
 var express = require('express');
 var path = require('path');
 var app = express();
+var hb = require('handlebars');
+var exphbs = require('express-handlebars');
 // var firebase = require('firebase/app');
 // require('firebase/database');
 
-app.use("/css",  express.static(__dirname + '/css'));
-app.use("/js", express.static(__dirname + '/js'));
-app.use("/media", express.static(__dirname + '/media'));
-app.use("/fonts", express.static(__dirname + '/fonts'));
-
+app.use("/css",  express.static(path.join(__dirname, '/css')));
+app.use("/js", express.static(path.join(__dirname, '/js')));
+app.use("/media", express.static(path.join(__dirname, '/media')));
+app.use("/fonts", express.static(path.join(__dirname, '/fonts')));
+app.use("/views", express.static(path.join(__dirname, 'views')))  ;
+app.engine('.hbs', exphbs({extname: '.hbs' }));
+app.set('view engine', '.hbs');
 var admin = require("firebase-admin");
 var serviceAccount = require(__dirname + '/serviceAccountKey.json');
 
@@ -42,7 +46,8 @@ app.get('/index', function(req, res) {
 });
 
 app.get('/trends', function(req, res) {
-  res.sendFile(path.join(__dirname + '/trends.html'));
+  // res.sendFile(path.join(__dirname + '/trends.html'));
+  res.render('trends2', {});
 });
 
 app.get('/register', function(req, res) {

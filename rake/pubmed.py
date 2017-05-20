@@ -8,7 +8,7 @@ from collections import OrderedDict
 from firebase import firebase
 from nltk.corpus import stopwords
 import xml.etree.ElementTree as ET
-import rake
+import rake_nltk
 import operator
 
 fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
@@ -54,15 +54,11 @@ def getKeyWords():
         #print(journalname)
         pubdate = jsonobj["result"][str(i)]["pubdate"]
         articleinfo = authors + title + " " + journalname + ". " + pubdate + ". " + "https://www.ncbi.nlm.nih.gov/pubmed/?term=" + str(i)
-        
+        #abstract stuff
         abstractXML = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract" + id_number
         response = requests.get(abstractXML, stream=True)
         response.raw.decode_content = True
         events = ET.iterparse(response.raw)
-        # e = ET.fromstring(response.content).getroot()
-        # print(e)
-        # for atype in e.findall('type'):
-        #     print(atype.get('AbstractText'))
         abstractText = ""
         for event, elem in events:
             if(elem.tag == "AbstractText"):

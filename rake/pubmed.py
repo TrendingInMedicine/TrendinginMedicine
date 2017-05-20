@@ -8,11 +8,12 @@ from collections import OrderedDict
 from firebase import firebase
 from nltk.corpus import stopwords
 import xml.etree.ElementTree as ET
-import rake_nltk
+import rake_nltk as rn
 import operator
 
 fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
-rake_object = rake.Rake("SmartStoplist.txt", 3, 3, 1)
+rake = rn.RakeKeywordExtractor()
+
 journals = set()
 keyWords = dict()
 translator = str.maketrans('', '', string.punctuation)
@@ -20,6 +21,7 @@ idlist = []
 titles = []
 s = "+"
 topic = 'surgery'
+#topic = 'cardiology'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
 l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]"]
 print(str(len(l)) + " journals searched for")
@@ -65,7 +67,7 @@ def getKeyWords():
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             print(abstractText)
-            keywords = rake_object.run(title + abstractText)
+            keywords = rake.extract((title + abstractText, , incl_scores=True)
             print("keywords: ", keywords)
 
 def storeInDatabase():

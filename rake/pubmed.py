@@ -15,7 +15,6 @@ fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.c
 rake = rn.RakeKeywordExtractor()
 
 journals = set()
-keyWords = dict()
 translator = str.maketrans('', '', string.punctuation)
 idlist = []
 titles = []
@@ -30,8 +29,13 @@ date = "&datetype=pdat&mindate=2017/03/01&maxdate=2017/03/31"
 count = "&retmax=10000"
 output = "&retmode=json"
 
+
+phrase_to_journal = dict()
+
 def getKeyWords():
-    global keyWords, idlist, searchURL, date, count, output
+    global phrase_to_journal, idlist, searchURL, date, count, output, junk
+    silly_var = 0
+    junk = 0
     for i in l:
         boshal = i.split(' ')
         journal = "&term=" + s.join(boshal)
@@ -62,18 +66,31 @@ def getKeyWords():
         response.raw.decode_content = True
         events = ET.iterparse(response.raw)
         abstractText = ""
+        silly_var = silly_var + 1
         for event, elem in events:
             if(elem.tag == "AbstractText"):
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
-            print(abstractText)
-            keywords = rake.extract((title + abstractText, , incl_scores=True)
-            print("keywords: ", keywords)
-
+            # print(abstractText)
+            rakePhrases = dict(rake.extract(title + abstractText, incl_scores=True))
+            # print("rakePhrases: ", rakePhrases)
+            for phrase in rakePhrases:
+                if rakePhrases[phrase] >= 5:
+                    if phrase in phrase_to_journal:
+                        alist = phrase_to_journal[phrase]
+                        alist.add(articleinfo)
+                    else:
+                        tempset = set()
+                        tempset.add(articleinfo)
+                        phrase_to_journal[phrase] = tempset
+        else:
+            junk = junk + 1
+    phrase_to_journal = OrderedDict(sorted(phrase_to_journal.items(),key=lambda t: len(t[1]), reverse=True))
+    return phrase_to_journal
 def storeInDatabase():
     countten = 0
     counter = 0
-    for i in keyWords.keys():
+    for i in phrase_to_journal.keys():
         if countten == 30:
             break
         print(i)
@@ -81,8 +98,8 @@ def storeInDatabase():
             if i in j:
                counter +=1
         #fb.put(topic, str(countten+1), [str(i)] + list(keyWords[i]))
-        print(len(keyWords[i]))
-        articles = list(keyWords[i])
+        print(len(phrase_to_journal[i]))
+        articles = list(phrase_to_journal[i])
         # for j in range(len(articles)):
         #     print(str(j) + "\t" + str(articles[j]))
         countten+=1
@@ -90,8 +107,8 @@ def storeInDatabase():
         counter = 0
 
 t1 = time.time()
-getKeyWords()
-# storeInDatabase()
+# print(getKeyWords())
+storeInDatabase()
 t2 = time.time()
 print(t2-t1)
 # result = fb.get('surgery', '3 abdominal')

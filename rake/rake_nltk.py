@@ -6,6 +6,7 @@ import nltk
 import string
 import inflect
 from string import digits
+import re
 
 p = inflect.engine()
 
@@ -25,7 +26,7 @@ class RakeKeywordExtractor:
     self.stopwords = set(nltk.corpus.stopwords.words())
     self.top_fraction = 1 # consider top third candidate keywords by score
   def _singularize(self, word):
-    if(word.endswith("ous") == True or word.endswith("sis") == True):
+    if(word.endswith("ous") == True or word.endswith("sis") == True or word.endswith("xis") == True):
         return word
     if(p.singular_noun(word) != False):
         word = p.singular_noun(word)
@@ -37,13 +38,13 @@ class RakeKeywordExtractor:
       words = ["|" if x in self.stopwords else x for x in nltk.word_tokenize(sentence.lower())]
       for w in range(len(words)):
           words[w] = self._singularize(words[w])
-          remove_digits = str.maketrans('', '', digits)
-          words[w] = words[w].translate(remove_digits)
+          words[w] = re.sub('[^A-Za-z|\d\s]+', '', words[w])
+        #   print([words[w]])
       #print("Words", words)
       phrase = []
       for word in words:
         if word == "|" or isPunct(word):
-          if len(phrase) > 0 and len(phrase) <= 4:
+          if len(phrase) > 0 and len(phrase) <= 3:
             phrase_list.append(phrase)
             phrase = []
         else:

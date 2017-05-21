@@ -107,9 +107,7 @@ def storeInDatabase():
         counter = 0
 
 t1 = time.time()
-# print(getKeyWords())
-storeInDatabase()
+getKeyWords()
+# storeInDatabase()
 t2 = time.time()
 print(t2-t1)
-# result = fb.get('surgery', '3 abdominal')
-# print(result)

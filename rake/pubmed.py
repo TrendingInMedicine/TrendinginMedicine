@@ -72,7 +72,7 @@ def getKeyWords():
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             # print(abstractText)
-            rakePhrases = dict(rake.extract(title + abstractText, 1, 3 incl_scores=True))
+            rakePhrases = dict(rake.extract(title + abstractText, 1, 3, incl_scores=True))
             # print("rakePhrases: ", rakePhrases)
             for phrase in rakePhrases:
                 if rakePhrases[phrase] >= 5:

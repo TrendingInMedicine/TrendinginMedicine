@@ -46,10 +46,24 @@ app.get('/index', function(req, res) {
 });
 
 app.get('/trends', function(req, res) {
+  var articles = [];
   // res.sendFile(path.join(__dirname + '/trends.html'));
+  var db = admin.database();
+  var ref = db.ref("surgery")
+  ref.once("value")
+  .then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot)
+    {
+      for(var i = 0; i < childSnapshot.val().length; i++)
+      {
+        articles.push(childSnapshot.val()[i]);
+      }
+  });
+  console.log(articles)
+  });
+
   res.render('trends2', {});
 });
-
 app.get('/register', function(req, res) {
   console.log("boshal")
   admin.auth().createUser({

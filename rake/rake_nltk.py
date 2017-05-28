@@ -1,8 +1,8 @@
 # Ankur Mishra
 # 2018amishra@gmail.com
-# RAKE Algoritm implemented in Python3 and uses NLTK
-# Singularizes nouns, uses consine distance to check similarity between phrases, and replaces acronyms
-# Specifcally designed for parsing medical journals
+# RAKE Algorithm implemented in Python3 and uses NLTK
+# Singularizes nouns, uses cosine distance to check similarity between phrases, and replaces acronyms
+# Specifically designed for parsing medical journals
 import operator
 import nltk
 from nltk.tokenize import PunktSentenceTokenizer
@@ -27,16 +27,16 @@ filter_phrases = set(l)
 
 custom_sent_tokenizer = PunktSentenceTokenizer(sample_text) # POS Tagging
 
-def switchAccs(para):
+def switchAccs(para): # acronyms are used a lot in medical articles, so we have to switch them out
     para = re.sub(r'\.([a-zA-Z])', r'. \1', para)
     st = para.split(" ")
     acc_to_full_word = dict()
     for i in range(len(st)):
-        # st[i] = _singularize(st[i])
+        # st[i] = singularize(st[i])
         if(st[i].startswith("(") and st[i].endswith(")")):
              firstChar = st[i][st[i].index("(")+1]
              acronym = st[i][st[i].index("(")+1:st[i].index(")")]
-             acronym = _singularize(acronym)
+             acronym = singularize(acronym)
 
              for j in range(i):
                  if(len(acronym) > 0 and st[i-j].lower().startswith(acronym[0].lower())):
@@ -45,19 +45,19 @@ def switchAccs(para):
     if(len(acc_to_full_word) > 0):
         for i in range(len(st)):
             if(i < len(st) and acc_to_full_word.get(st[i].replace(".", "")) != None):
-                st[i:i+1] = acc_to_full_word.get(_singularize(st[i].replace(".", "")))
+                st[i:i+1] = acc_to_full_word.get(singularize(st[i].replace(".", "")))
     return " ".join(st)
 
-def isPunct(word):
+def is_punct(word):
     return len(word) == 1 and word in string.punctuation
 
-def isNumeric(word):
+def is_numeric(word):
     try:
         float(word) if '.' in word else int(word)
         return True
     except ValueError:
         return False
-def _singularize(word):
+def singularize(word):
     if(word == "is" or word == "was" or word.endswith("ous") or word.endswith("sis") or word.endswith("xis") or word.endswith("ess") or word == ("thus") or word == ("this") or word.endswith("oss") or word.endswith("ass")):
         return word
     if(p.singular_noun(word) != False):
@@ -74,12 +74,12 @@ class RAKE:
         for sentence in sentences:
             words = ["|" if x.lower() in self.stopwords else x for x in nltk.word_tokenize(sentence)]
             for w in range(len(words)):
-                # words[w] = _singularize(words[w])
+                words[w] = singularize(words[w])
                 words[w] = re.sub('[^A-Za-z|\d\s]+', ' ', words[w])
                 words[w] = re.sub(r'_u\d_v\d', '_u%d_v%d', words[w])
             phrase = []
             for word in words:
-                if word == "|" or isPunct(word) or nltk.tag.pos_tag([word])[0][1] == ('IN'):
+                if word == "|" or is_punct(word) or nltk.tag.pos_tag([word])[0][1] == ('IN'):
                     if len(phrase) >= lower and len(phrase) <= upper :
                         if nltk.tag.pos_tag(phrase[-1])[0][1].startswith('R'):
                             phrase.pop()
@@ -92,24 +92,24 @@ class RAKE:
 
     def _calculate_word_scores(self, phrase_list):
         word_freq = nltk.FreqDist()
-        word_degree = nltk.FreqDist()
+        word_weight = nltk.FreqDist()
         for phrase in phrase_list:
-            degree = len([x for x in phrase if not isNumeric(x)]) - 1
+            weight = len([x for x in phrase if not is_numeric(x)]) - 1
             for x in range(len(phrase)):
                 phrase = [x for x in phrase if x]
                 # mess with weighting here
-                if(phrase[x].lower() in filter_phrases or phrase[x].lower() == 'surgery' or phrase[x].lower() == 'surgical'):
-                    degree = -5
-                if(len(phrase[x]) > 5):
-                    degree = degree + 1
+                if(phrase[x].lower() in filter_phrases or phrase[x].lower() == 'surgery' or phrase[x].lower() == 'surgical'): # filter these
+                    weight = -5
+                if(len(phrase[x]) > 5): #if words more complex, gets higher weighting
+                    weight = weight + 1
             for word in phrase:
                 word_freq.update([word])
-                word_degree[word] += degree
+                word_weight[word] += weight
         for word in list(word_freq.keys()):
-            word_degree[word] = word_degree[word] + 1.5 * word_freq[word] # Frequency > Complexity
+            word_weight[word] = word_weight[word] + 1.5 * word_freq[word] # Frequency > Complexity
         word_scores = {}
         for word in list(word_freq.keys()):
-            word_scores[word] = word_degree[word] / word_freq[word]
+            word_scores[word] = word_weight[word] / word_freq[word]
         return word_scores
 
     def _calculate_phrase_scores(self, phrase_list, word_scores):
@@ -117,7 +117,7 @@ class RAKE:
         for phrase in phrase_list:
             phrase_score = 0
             for word in phrase:
-                word = _singularize(word)
+                word = singularize(word)
                 if(word_scores.get(word) != None):
                     phrase_score += word_scores[word]
             temp =  " ".join(phrase).lower()

@@ -41,7 +41,6 @@ def getKeyWords():
         r = requests.get(searchURL + journal + date + count + output)
         jsonobj = json.loads(r.text)
         idlist += jsonobj["esearchresult"]["idlist"]
-    print(str(len(idlist)) + " articles found")
     searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed"
     for i in idlist:
         id_number = "&id=" + str(i)
@@ -73,8 +72,8 @@ def getKeyWords():
             # print(abstractText)
             rakePhrases = rake.extract(title + abstractText, 1, 3, incl_scores=True)
 
-            print(abstractText + "\n")
-            print("rakePhrases: ", rakePhrases)
+            # print(abstractText + "\n")
+            # print("rakePhrases: ", rakePhrases)
 
             rakePhrases = dict(rakePhrases)
 
@@ -89,6 +88,7 @@ def getKeyWords():
                         phrase_to_journal[phrase] = tempset
         else:
             junk = junk + 1
+    print(str(len(idlist)-junk) + " articles found")
     phrase_to_journal = OrderedDict(sorted(phrase_to_journal.items(),key=lambda t: len(t[1]), reverse=True))
     return phrase_to_journal
 def storeInDatabase():

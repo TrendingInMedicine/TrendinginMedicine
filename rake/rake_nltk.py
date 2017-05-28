@@ -18,141 +18,152 @@ The use of contralateral prophylactic mastectomies (CPMs) among patients with in
 l = []
 read = open("stat_words.txt", "r")
 for i in read:
-     l.append(i.rstrip('\n'))
+    l.append(i.rstrip('\n'))
 
 common_phrases = set(l)
 custom_sent_tokenizer = PunktSentenceTokenizer(sample_text)
-def getAccs(para):
-    l = para.split(" ")
-    for word in l:
-        word = _singularize(word)
-        print(word)
-        if word.startswith("(") and word[word.index("(") + 1].isalpha() and word.endswith(")"):
-            for i in range(word.index("(") + 1, word.index(")")):
-                if(word[i] == word[i].upper()):
-                    print(i)
-                    print(word[i])
+def switchAccs(para):
+    para = re.sub(r'\.([a-zA-Z])', r'. \1', para)
+    st = para.split(" ")
+    acc_to_full_word = dict()
+    for i in range(len(st)):
+        # st[i] = _singularize(st[i])
+        if(st[i].startswith("(") and st[i].endswith(")")):
+             firstChar = st[i][st[i].index("(")+1]
+             accronym = st[i][st[i].index("(")+1:st[i].index(")")]
+             accronym = _singularize(accronym)
+
+             for j in range(i):
+                 if(len(accronym) > 0 and st[i-j].lower().startswith(accronym[0].lower())):
+                     full_word = st[i-j:i]
+                     acc_to_full_word[accronym] = full_word
+    for i in range(len(st)):
+        if(i < len(st) and acc_to_full_word.get(st[i].replace(".", "")) != None):
+            st[i:i+1] = acc_to_full_word.get(_singularize(st[i].replace(".", "")))
+            # st.pop(i-1)
+    return " ".join(st)
 
 def isPunct(word):
-  return len(word) == 1 and word in string.punctuation
+    return len(word) == 1 and word in string.punctuation
 
 def isNumeric(word):
-  try:
-    float(word) if '.' in word else int(word)
-    return True
-  except ValueError:
-    return False
+    try:
+        float(word) if '.' in word else int(word)
+        return True
+    except ValueError:
+        return False
 def _singularize(word):
-  if(word.endswith("ous") or word.endswith("sis") or word.endswith("xis") or word.endswith("ess")):
-      return word
-  if(p.singular_noun(word) != False):
-      word = p.singular_noun(word)
-  return word
+    if(word == "is" or word == "was" or word.endswith("ous") or word.endswith("sis") or word.endswith("xis") or word.endswith("ess") or word == ("thus") or word == ("this") or word.endswith("oss") or word.endswith("ass")):
+        return word
+    if(p.singular_noun(word) != False):
+        word = p.singular_noun(word)
+    return word
 
 class RakeKeywordExtractor:
 
-  def __init__(self):
-    self.stopwords = set(nltk.corpus.stopwords.words())
-    self.top_fraction = 1 # consider top third candidate keywords by score
-  def _generate_candidate_keywords(self, sentences, lower, upper):
-    phrase_list = []
-    for sentence in sentences:
-    #   print(sentence)
-      words = ["|" if x in self.stopwords else x for x in nltk.word_tokenize(sentence)]
-      for w in range(len(words)):
-          words[w] = _singularize(words[w])
-          words[w] = re.sub('[^A-Za-z|\d\s]+', ' ', words[w])
-        #   print([words[w]])
-      #print("Words", words)
-      phrase = []
-      for word in words:
-        if word == "|" or isPunct(word):
-          if len(phrase) >= lower and len(phrase) <= upper :
-            phrase_list.append(phrase)
+    def __init__(self):
+        self.stopwords = set(nltk.corpus.stopwords.words())
+        self.top_fraction = 1 # consider top third candidate keywords by score
+    def _generate_candidate_keywords(self, sentences, lower, upper):
+        phrase_list = []
+        for sentence in sentences:
+            #   print(sentence)
+            words = ["|" if x.lower() in self.stopwords else x for x in nltk.word_tokenize(sentence)]
+            for w in range(len(words)):
+                words[w] = _singularize(words[w])
+                words[w] = re.sub('[^A-Za-z|\d\s]+', ' ', words[w])
+                words[w] = re.sub(r'_u\d_v\d', '_u%d_v%d', words[w])
+                #   print([words[w]])
+            #print("Words", words)
             phrase = []
+            for word in words:
+                if word == "|" or isPunct(word) or nltk.tag.pos_tag([word])[0][1] == ('IN'):
+                    if len(phrase) >= lower and len(phrase) <= upper :
+                        if nltk.tag.pos_tag(phrase[-1])[0][1].startswith('R'):
+                            phrase.pop()
+                        phrase_list.append(phrase)
+                        phrase = []
+                else:
+                    if word != " ":
+                        phrase.append(word)
+        return phrase_list
+
+    def _calculate_word_scores(self, phrase_list):
+        word_freq = nltk.FreqDist()
+        word_degree = nltk.FreqDist()
+        for phrase in phrase_list:
+            degree = len([x for x in phrase if not isNumeric(x)]) - 1
+            for x in range(len(phrase)):
+                phrase = [x for x in phrase if x]
+                # mess with weighting here
+                # print([phrase[x]])
+                if(phrase[x].lower() in common_phrases or phrase[x].lower() == 'surgery' or phrase[x].lower() == 'surgical'):
+                    degree = -5
+                if(len(phrase[x]) > 5):
+                    degree = degree + 1
+            # nltk.tag.pos_tag([phrase])
+            for word in phrase:
+                word_freq.update([word])
+                word_degree[word] += degree
+                # word_degree.update([word], degree) # other words
+        for word in list(word_freq.keys()):
+            word_degree[word] = word_degree[word] + word_freq[word] # itself
+        # word score = deg(w) / freq(w)
+        word_scores = {}
+        for word in list(word_freq.keys()):
+            word_scores[word] = word_degree[word] / word_freq[word]
+        return word_scores
+
+    def _calculate_phrase_scores(self, phrase_list, word_scores):
+        phrase_scores = {}
+        for phrase in phrase_list:
+            phrase_score = 0
+            for word in phrase:
+                word = _singularize(word)
+                if(word_scores.get(word) != None):
+                    phrase_score += word_scores[word]
+            temp =  " ".join(phrase).lower()
+            temp = re.sub(' +',' ', temp)
+            phrase_scores[temp] = phrase_score
+        for phrase1 in phrase_list:
+            for phrase2 in phrase_list:
+                s1 = " ".join(phrase1).lower()
+                s2 = " ".join(phrase2).lower()
+                if s1 == s2:
+                    continue
+                # print(s1, phrase_scores.get(s1))
+                # print(s2, phrase_scores.get(s2))
+                vector1 = cs.text_to_vector(s1)
+                vector2 = cs.text_to_vector(s2)
+                cosine = cs.get_cosine(vector1, vector2)
+                if(cosine >= .49):
+                    if not (phrase_scores.get(s1) == None or phrase_scores.get(s2) == None):
+                        if phrase_scores.get(s1) > phrase_scores.get(s2):
+                            phrase_scores.pop(s1, None)
+                        elif phrase_scores.get(s1) < phrase_scores.get(s2):
+                            phrase_scores.pop(s2, None)
+        return phrase_scores
+
+    def extract(self, text, lower, upper, incl_scores=False):
+        text = switchAccs(text)
+        sentences = nltk.sent_tokenize(text)
+        phrase_list = self._generate_candidate_keywords(sentences, lower, upper)
+        word_scores = self._calculate_word_scores(phrase_list)
+        phrase_scores = self._calculate_phrase_scores(
+            phrase_list, word_scores)
+        sorted_phrase_scores = sorted(iter(phrase_scores.items()),
+                                      key=operator.itemgetter(1), reverse=True)
+        n_phrases = len(sorted_phrase_scores)
+        if incl_scores:
+            return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
         else:
-          if not nltk.tag.pos_tag([word])[0][1].startswith('IN'):
-              phrase.append(word)
-    return phrase_list
-
-  def _calculate_word_scores(self, phrase_list):
-    word_freq = nltk.FreqDist()
-    word_degree = nltk.FreqDist()
-    for phrase in phrase_list:
-      degree = len([x for x in phrase if not isNumeric(x)]) - 1
-      for x in range(len(phrase)):
-          phrase = [x for x in phrase if x]
-          #mess with weighting here
-        #   print([phrase[x]])
-          if(phrase[x] in common_phrases or phrase[x] == 'surgery' or phrase[x] == 'surgical'):
-              degree = 0
-          if(not nltk.tag.pos_tag([phrase[x]])[0][1].startswith('N')):
-              degree = degree - 1
-          if(nltk.tag.pos_tag([phrase[x]])[0][1].startswith('J')):
-              degree = degree + 1
-          if(nltk.tag.pos_tag([phrase[x]])[0][1].startswith('R') or nltk.tag.pos_tag([phrase[x]])[0][1].startswith('IN')):
-              degree = degree - 5
-          else:
-              degree = degree + 2
-      # nltk.tag.pos_tag([phrase])
-      for word in phrase:
-        word_freq.update([word])
-        word_degree[word] += degree
-        # word_degree.update([word], degree) # other words
-    for word in list(word_freq.keys()):
-      word_degree[word] = word_degree[word] + word_freq[word] # itself
-    # word score = deg(w) / freq(w)
-    word_scores = {}
-    for word in list(word_freq.keys()):
-      word_scores[word] = word_degree[word] / word_freq[word]
-    return word_scores
-
-  def _calculate_phrase_scores(self, phrase_list, word_scores):
-    phrase_scores = {}
-    for phrase in phrase_list:
-      phrase_score = 0
-      for word in phrase:
-        if(word != ''):
-            phrase_score += word_scores[word]
-      phrase_scores[" ".join(phrase).lower()] = phrase_score
-    for phrase1 in phrase_list:
-        for phrase2 in phrase_list:
-            s1 = " ".join(phrase1).lower()
-            s2 = " ".join(phrase2).lower()
-            if s1 == s2:
-                continue
-            # print(s1, phrase_scores.get(s1))
-            # print(s2, phrase_scores.get(s2))
-            vector1 = cs.text_to_vector(s1)
-            vector2 = cs.text_to_vector(s2)
-            cosine = cs.get_cosine(vector1, vector2)
-            if(cosine >= .49):
-                if not (phrase_scores.get(s1) == None or phrase_scores.get(s2) == None):
-                    if phrase_scores.get(s1) > phrase_scores.get(s2):
-                        phrase_scores.pop(s1, None)
-                    elif phrase_scores.get(s1) < phrase_scores.get(s2):
-                        phrase_scores.pop(s2, None)
-    return phrase_scores
-
-  def extract(self, text, lower, upper, incl_scores=False):
-    sentences = nltk.sent_tokenize(text)
-    phrase_list = self._generate_candidate_keywords(sentences, lower, upper)
-    word_scores = self._calculate_word_scores(phrase_list)
-    phrase_scores = self._calculate_phrase_scores(
-      phrase_list, word_scores)
-    sorted_phrase_scores = sorted(iter(phrase_scores.items()),
-      key=operator.itemgetter(1), reverse=True)
-    n_phrases = len(sorted_phrase_scores)
-    if incl_scores:
-      return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
-    else:
-      return [x[0] for x in sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]]
+            return [x[0] for x in sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]]
 
 def test():
-  rake = RakeKeywordExtractor()
-  keywords = rake.extract(sample_text, 1, 3, incl_scores=True)
-  print("Keywords:", keywords)
+    rake = RakeKeywordExtractor()
+    keywords = rake.extract(sample_text, 1, 3, incl_scores=True)
+    print("Keywords:", keywords)
 
 if __name__ == "__main__":
-    getAccs(sample_text)
     test()
+    # switchAccs(sample_text)

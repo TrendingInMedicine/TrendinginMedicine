@@ -78,7 +78,7 @@ def getKeyWords():
             rakePhrases = dict(rakePhrases)
 
             for phrase in rakePhrases:
-                if rakePhrases[phrase] >= 8:
+                if rakePhrases[phrase] >= 10:
                     if phrase in phrase_to_journal:
                         alist = phrase_to_journal[phrase]
                         alist.add(articleinfo)

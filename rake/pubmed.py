@@ -12,7 +12,7 @@ import rake_nltk as rn
 import operator
 
 fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
-rake = rn.RakeKeywordExtractor()
+rake = rn.RAKE()
 
 journals = set()
 translator = str.maketrans('', '', string.punctuation)

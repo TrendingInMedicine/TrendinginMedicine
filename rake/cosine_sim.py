@@ -1,3 +1,5 @@
+# author: vpekar
+# source: https://stackoverflow.com/questions/15173225/how-to-calculate-cosine-similarity-given-2-sentence-strings-python
 import re, math
 from collections import Counter
 

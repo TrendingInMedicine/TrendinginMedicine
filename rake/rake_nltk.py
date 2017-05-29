@@ -1,7 +1,7 @@
-# Ankur Mishra
-# 2018amishra@gmail.com
+# Author: Ankur Mishra
+# Email: 2018amishra@gmail.com
 # RAKE Algorithm implemented in Python3 and uses NLTK
-# Singularizes nouns, uses cosine distance to check similarity between phrases, and replaces acronyms
+# Singularizes nouns, uses cosine similarity to check if phrases are alike, and replaces acronyms
 # Specifically designed for parsing medical journals
 import operator
 import nltk
@@ -37,26 +37,25 @@ def switchAccs(para): # acronyms are used a lot in medical articles, so we have 
              firstChar = st[i][st[i].index("(")+1]
              acronym = st[i][st[i].index("(")+1:st[i].index(")")]
              acronym = singularize(acronym)
-
-             for j in range(i):
-                 if(len(acronym) > 0 and st[i-j].lower().startswith(acronym[0].lower())):
-                     full_word = st[i-j:i]
-                     acc_to_full_word[acronym] = full_word
+             if(acronym != None):
+                 for j in range(i):
+                     word = st[i-j].lower()
+                     if(len(acronym) > 0 and word.startswith(acronym[0].lower())):
+                         full_word = st[i-j:i]
+                         acc_to_full_word[acronym] = full_word
     if(len(acc_to_full_word) > 0):
         for i in range(len(st)):
             if(i < len(st) and acc_to_full_word.get(st[i].replace(".", "")) != None):
                 st[i:i+1] = acc_to_full_word.get(singularize(st[i].replace(".", "")))
     return " ".join(st)
 
-def is_punct(word):
-    return len(word) == 1 and word in string.punctuation
-
-def is_numeric(word):
+def is_digit(word):
     try:
         float(word) if '.' in word else int(word)
         return True
     except ValueError:
         return False
+
 def singularize(word):
     if(word == "is" or word == "was" or word.endswith("ous") or word.endswith("sis") or word.endswith("xis") or word.endswith("ess") or word == ("thus") or word == ("this") or word.endswith("oss") or word.endswith("ass")):
         return word
@@ -79,7 +78,7 @@ class RAKE:
                 words[w] = re.sub(r'_u\d_v\d', '_u%d_v%d', words[w])
             phrase = []
             for word in words:
-                if word == "|" or is_punct(word) or nltk.tag.pos_tag([word])[0][1] == ('IN'):
+                if word == "|" or nltk.tag.pos_tag([word])[0][1] == ('IN') or word.endswith("ing") :
                     if len(phrase) >= lower and len(phrase) <= upper :
                         if nltk.tag.pos_tag(phrase[-1])[0][1].startswith('R'):
                             phrase.pop()
@@ -90,16 +89,16 @@ class RAKE:
                         phrase.append(word)
         return phrase_list
 
-    def _calculate_word_scores(self, phrase_list):
+    def _calculate_word_weights(self, phrase_list):
         word_freq = nltk.FreqDist()
         word_weight = nltk.FreqDist()
         for phrase in phrase_list:
-            weight = len([x for x in phrase if not is_numeric(x)]) - 1
+            weight = len([x for x in phrase if not is_digit(x)]) - 1
             for x in range(len(phrase)):
                 phrase = [x for x in phrase if x]
                 # mess with weighting here
                 if(phrase[x].lower() in filter_phrases or phrase[x].lower() == 'surgery' or phrase[x].lower() == 'surgical'): # filter these
-                    weight = -5
+                    weight = -10
                 if(len(phrase[x]) > 5): #if words more complex, gets higher weighting
                     weight = weight + 1
             for word in phrase:
@@ -107,19 +106,19 @@ class RAKE:
                 word_weight[word] += weight
         for word in list(word_freq.keys()):
             word_weight[word] = word_weight[word] + 1.5 * word_freq[word] # Frequency > Complexity
-        word_scores = {}
+        word_weights = {}
         for word in list(word_freq.keys()):
-            word_scores[word] = word_weight[word] / word_freq[word]
-        return word_scores
+            word_weights[word] = word_weight[word] / word_freq[word]
+        return word_weights
 
-    def _calculate_phrase_scores(self, phrase_list, word_scores):
+    def _calculate_phrase_scores(self, phrase_list, word_weights):
         phrase_scores = {}
         for phrase in phrase_list:
             phrase_score = 0
             for word in phrase:
                 word = singularize(word)
-                if(word_scores.get(word) != None):
-                    phrase_score += word_scores[word]
+                if(word_weights.get(word) != None):
+                    phrase_score += word_weights[word]
             temp =  " ".join(phrase).lower()
             temp = re.sub(' +',' ', temp)
             phrase_scores[temp] = phrase_score
@@ -141,24 +140,21 @@ class RAKE:
                             phrase_scores.pop(s2, None)
         return phrase_scores
 
-    def extract(self, text, lower, upper, incl_scores=False):
+    def extract(self, text, lower, upper):
         text = switchAccs(text)
         sentences = nltk.sent_tokenize(text)
         phrase_list = self._generate_candidate_keywords(sentences, lower, upper)
-        word_scores = self._calculate_word_scores(phrase_list)
+        word_weights = self._calculate_word_weights(phrase_list)
         phrase_scores = self._calculate_phrase_scores(
-            phrase_list, word_scores)
+            phrase_list, word_weights)
         sorted_phrase_scores = sorted(iter(phrase_scores.items()),
                                       key=operator.itemgetter(1), reverse=True)
         n_phrases = len(sorted_phrase_scores)
-        if incl_scores:
-            return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
-        else:
-            return [x[0] for x in sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]]
+        return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
 
 def test():
     rake = RAKE()
-    keywords = rake.extract(sample_text, 1, 3, incl_scores=True)
+    keywords = rake.extract(sample_text, 1, 3)
     print("Keywords:", keywords)
 
 if __name__ == "__main__":

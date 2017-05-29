@@ -25,7 +25,7 @@ topic = 'surgery'
 l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]"]
 print(str(len(l)) + " journals searched for")
 searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
-date = "&datetype=pdat&mindate=2017/04/01&maxdate=2017/04/31"
+date = "&datetype=pdat&mindate=2017/02/01&maxdate=2017/02/31"
 count = "&retmax=10000"
 output = "&retmode=json"
 
@@ -39,6 +39,8 @@ def getKeyWords():
         boshal = i.split(' ')
         journal = "&term=" + s.join(boshal)
         r = requests.get(searchURL + journal + date + count + output)
+        if r.text == None:
+            r.text = ""
         jsonobj = json.loads(r.text)
         idlist += jsonobj["esearchresult"]["idlist"]
     searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed"
@@ -70,7 +72,7 @@ def getKeyWords():
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             # print(abstractText)
-            rakePhrases = rake.extract(title + abstractText, 1, 3, incl_scores=True)
+            rakePhrases = rake.extract(title + abstractText, 1, 3)
 
             # print(abstractText + "\n")
             # print("rakePhrases: ", rakePhrases)

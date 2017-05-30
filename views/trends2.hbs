@@ -173,12 +173,12 @@
     io.emit("topic", {topic:s.toLowerCase()});
     io.on("topPhrases", function(data){
       var myDiv = document.getElementById("topPhrases");
-      // console.log(data.articles);
+      console.log(data.articles);
       for (var i = 0; i < data.articles.length; i++) {
         var temp = data.articles[i].split(" ");
         if (temp.length <= 4 ){
           var term = document.createElement("h3");
-          // console.log(term);
+          console.log(term);
           var t = document.createTextNode(data.articles[i]);
           term.appendChild(t);
           myDiv.appendChild(term);

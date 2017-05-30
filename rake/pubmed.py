@@ -22,10 +22,10 @@ s = "+"
 topic = 'surgery'
 #topic = 'cardiology'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
-l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]"]
+l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]",'The American journal of surgical pathology', 'Annals of surgical oncology', 'Surgical endoscopy', 'Microsurgery', 'Journal of surgical oncology', 'European journal of surgical oncology : the journal of the European Society of Surgical Oncology and the British Association of Surgical Oncology', 'Surgical oncology clinics of North America', 'Seminars in pediatric surgery', 'Surgical infections', 'World journal of emergency surgery : WJES', 'World journal of surgical oncology', 'Minimally invasive surgery', 'ANZ journal of surgery', 'Pediatric surgery international', 'International journal of surgical pathology']
 print(str(len(l)) + " journals searched for")
 searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
-date = "&datetype=pdat&mindate=2017/02/01&maxdate=2017/02/31"
+date = "&datetype=pdat&mindate=2017/03/01&maxdate=2017/03/31"
 count = "&retmax=10000"
 output = "&retmode=json"
 
@@ -102,7 +102,7 @@ def storeInDatabase():
         for j in titles:
             if i in j:
                counter +=1
-        #fb.put(topic, str(countten+1), [str(i)] + list(keyWords[i]))
+        fb.put(topic, str(countten+1), [str(i)] + list(keyWords[i]))
         print(i, len(phrase_to_journal[i]))
         articles = list(phrase_to_journal[i])
         # for j in range(len(articles)):

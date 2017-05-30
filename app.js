@@ -6,6 +6,9 @@ var path = require('path');
 var app = express();
 var hb = require('handlebars');
 var exphbs = require('express-handlebars');
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
+
 // var firebase = require('firebase/app');
 // require('firebase/database');
 
@@ -23,6 +26,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://trendinginmedicine-f41fc.firebaseio.com"
 });
+var articles = [];
 
 //how to firebase:
 // var db = admin.database();
@@ -35,8 +39,10 @@ admin.initializeApp({
 //
 // });
 
-app.set('port', process.env.PORT || 8080);
-
+// app.set('port', process.env.PORT || 8080);
+http.listen(8080, function(){
+  console.log('hosted on: http://localhost:8080');
+})
 app.get('/', function(req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
 });
@@ -45,8 +51,29 @@ app.get('/index', function(req, res) {
   res.sendFile(path.join(__dirname + '/index.html'));
 });
 
+io.on("connection", function(socket){
+  // socket.emit("connection", {articles:articles});
+  socket.on("topic", function(data){
+    var db = admin.database();
+    console.log(data.topic);
+    var ref = db.ref(data.topic);
+    ref.once("value")
+    .then(function(snapshot) {
+      snapshot.forEach(function(childSnapshot)
+      {
+        for(var i = 0; i < childSnapshot.val().length; i++)
+        {
+          articles.push(childSnapshot.val()[i]);
+        }
+    });
+
+    socket.emit("topPhrases", {articles : articles});
+    console.log("xd");
+    });
+  });
+});
+
 app.get('/trends', function(req, res) {
-  var articles = [];
   // res.sendFile(path.join(__dirname + '/trends.html'));
   var db = admin.database();
   var ref = db.ref("surgery")
@@ -59,11 +86,13 @@ app.get('/trends', function(req, res) {
         articles.push(childSnapshot.val()[i]);
       }
   });
-  console.log(articles)
+
+  // console.log(articles)
   });
 
   res.render('trends2', {});
 });
+
 app.get('/register', function(req, res) {
   console.log("boshal")
   admin.auth().createUser({

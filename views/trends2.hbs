@@ -18,22 +18,27 @@
 
   <!--Stylesheet for logins-->
   <link href="css/stylesheet.css" rel="stylesheet">
-
-  <!-- JQuery-->
-  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-
-  <!-- Javascript-->
-  <script src="js/login_register.js" type="text/javascript"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
   <!-- link for css font Ubuntu is good and so is Roboto -->
   <link href='https://fonts.googleapis.com/css?family=Roboto:light' rel='stylesheet' type='text/css'>
   <style>
-  body{
-    font-family: 'Roboto', serif;
-  }
+    body{
+      font-family: 'Roboto', serif;
+    }
+    a{
+      color: #039BE5;
+      font-family: 'Roboto', serif;
+    }
+    a:hover{
+      color: #039BE5;
+      font-weight: bold;
+    }
   </style>
-
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/login_register.js" type="text/javascript"></script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
+  <script type="text/javascript">
+  </script>
 </head>
 <body id="page-top" data-spy="scroll">
   <!-- line 4356 -->
@@ -123,16 +128,13 @@
       </div>
     </div>
   </div>
-
-
-
   <div class = "container" style = "margin-top:90px; margin-bottom:100px;">
-
-
     <div id = "boshal">
 
     </div>
+    <div id="topPhrases" style="">
 
+    </div>
     <ul>
       {{words}}
     </ul>
@@ -152,6 +154,7 @@
   <script src="js/bootstrap.min.js"></script>
   <!-- javascript urlParams -->
   <script type="text/javascript">
+    var io = io().connect();
     var urlParams = new URLSearchParams(window.location.search);
     // console.log(urlParams.get('topic'));
     var s = urlParams.get('topic');
@@ -160,18 +163,52 @@
     }
     else {
       var s = s[0].toUpperCase() + s.slice(1);
-
-
-
       var myDiv = document.getElementById('boshal');
-            var h1 = document.createElement("h1");
-            var t = document.createTextNode(s);
-            h1.appendChild(t);
-            myDiv.appendChild(h1);
-
-
-
+      var h1 = document.createElement("h1");
+      var t = document.createTextNode(s);
+      h1.appendChild(t);
+      myDiv.appendChild(h1);
+      console.log(s.toLowerCase());
     }
+    io.emit("topic", {topic:s.toLowerCase()});
+    io.on("topPhrases", function(data){
+      var myDiv = document.getElementById("topPhrases");
+      // console.log(data.articles);
+      for (var i = 0; i < data.articles.length; i++) {
+        var temp = data.articles[i].split(" ");
+        if (temp.length <= 4 ){
+          var term = document.createElement("h3");
+          // console.log(term);
+          var t = document.createTextNode(data.articles[i]);
+          term.appendChild(t);
+          myDiv.appendChild(term);
+          var j = 0;
+        }
+        else{
+          var article = document.createElement("a");
+          var ref  = data.articles[i].substring(data.articles[i].indexOf("https:"), data.articles[i].length);
+          // console.log(ref);
+          article.setAttribute('href', ref);
+          var t = document.createTextNode(data.articles[i]);
+          article.appendChild(t);
+          if (j <= 4){
+            myDiv.appendChild(article);
+            myDiv.appendChild(document.createElement("br"));
+            myDiv.appendChild(document.createElement("br"));
+          }
+          if (j == 4){
+            var read = document.createElement("a");
+            var rt = document.createTextNode("View more");
+            read.style.align = "center"
+            read.appendChild(rt);
+            read.setAttribute('class', "read_more");
+            myDiv.appendChild(read);
+
+          }
+          j++;
+        }
+      }
+    });
     document.title = "#TrendingIn" + s;
   </script>
   <!-- javascript urlParams -->

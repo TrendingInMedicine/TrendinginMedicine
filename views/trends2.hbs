@@ -154,7 +154,7 @@
   <script src="js/bootstrap.min.js"></script>
   <!-- javascript urlParams -->
   <script type="text/javascript">
-    var io = io().connect();
+    var socket = io();
     var urlParams = new URLSearchParams(window.location.search);
     // console.log(urlParams.get('topic'));
     var s = urlParams.get('topic');
@@ -170,9 +170,12 @@
       myDiv.appendChild(h1);
       console.log(s.toLowerCase());
     }
-    io.emit("topic", {topic:s.toLowerCase()});
-    io.on("topPhrases", function(data){
+    socket.io.reconnect();
+    socket.emit('topic', {topic:s.toLowerCase()});
+    socket.on("sendArticles", function(data){
+      console.log("xd");
       var myDiv = document.getElementById("topPhrases");
+
       console.log(data.articles);
       for (var i = 0; i < data.articles.length; i++) {
         var temp = data.articles[i].split(" ");

@@ -10,12 +10,13 @@ import string
 from string import digits
 import re
 import inflect
+import traceback
 import cosine_sim as cs
 
 p = inflect.engine()
 
-sample_text = """
-The use of contralateral prophylactic mastectomies (CPMs) among patients with invasive unilateral breast cancer has increased substantially during the past decade in the United States despite the lack of evidence for survival benefit. However, whether this trend varies by state or whether it is correlated with changes in proportions of reconstructive surgery among these patients is unclear.To determine state variation in the temporal trend and in the proportion of CPMs among women with early-stage unilateral breast cancer treated with surgery.A retrospective cohort study of 1.2 million women 20 years of age or older diagnosed with invasive unilateral early-stage breast cancer and treated with surgery from January 1, 2004, through December 31, 2012, in 45 states and the District of Columbia as compiled by the North American Association of Central Cancer Registries. Data analysis was performed from August 1, 2015, to August 31, 2016.Contralateral prophylactic mastectomy.Temporal changes in the proportion of CPMs among women with early-stage unilateral breast cancer treated with surgery by age and state, overall and in relation to changes in the proportions of those who underwent reconstructive surgery.Among the 1 224 947 women with early-stage breast cancer treated with surgery, the proportion who underwent a CPM nationally increased between 2004 and 2012 from 3.6% (4013 of 113 001) to 10.4% (12 890 of 124 231) for those 45 years or older and from 10.5% (1879 of 17 862) to 33.3% (5237 of 15 745) for those aged 20 to 44 years. The increase was evident in all states, although the magnitude of the increase varied substantially across states. For example, among women 20 to 44 years of age, the proportion who underwent a CPM from 2004-2006 to 2010-2012 increased from 14.9% (317 of 2121) to 24.8% (436 of 1755) (prevalence ratio [PR], 1.66; 95% CI, 1.46-1.89) in New Jersey compared with an increase from 9.8% (162 of 1657) to 32.2% (495 of 1538) (PR, 3.29; 95% CI, 2.80-3.88) in Virginia. In this age group, CPM proportions for the period from 2010 to 2012 were over 42% in the contiguous states of Nebraska, Missouri, Colorado, Iowa, and South Dakota. From 2004 to 2012, the proportion of reconstructive surgical procedures among women aged 20 to 44 years who were diagnosed with early-stage breast cancer and received a CPM increased in many states; however, it did not correlate with the proportion of women who received a CPM.The increase in the proportion of CPMs among women with early-stage unilateral breast cancer treated with surgery varied substantially across states. Notably, in 5 contiguous Midwest states, nearly half of young women with invasive early-stage breast cancer underwent a CPM from 2010 to 2012. Future studies should examine the reasons for the geographic variation and increasing trend in the use of CPMs.
+sample_text ="""
+Feasibility, safety, and outcomes of a single-step endoscopic ultrasonography-guided drainage of pancreatic fluid collections without fluoroscopy using a novel electrocautery-enhanced lumen-apposing, self-expanding metal stent. There are currently limited data available regarding the safety of endoscopic ultrasound (EUS)-guided drainage of pancreatic fluid collections (PFCs) using the lumen-apposing metal stent without fluoroscopic guidance. This study aims to evaluate clinical outcomes and safety of EUS-guided drainage of pancreatic fluid collections without fluoroscopy using a novel electrocautery-enhanced lumen-apposing, self-expanding metal stent. There are currently limited data available regarding the safety of endoscopic ultrasound (EUS)-guided drainage of pancreatic fluid collections using the electrocautery-enhanced lumen-apposing metal stents (EC-LAMSs) without fluoroscopic guidance. We conducted a retrospective study on patients with symptomatic pancreatic fluid collections without fluoroscopy using a novel electrocautery-enhanced lumen-apposing, self-expanding metal stent. There are currently limited data available regarding the safety of endoscopic ultrasound (EUS)-guided drainage of pancreatic fluid collections who underwent EUS-guided drainage using EC-LAMS without fluoroscopy. All patients were followed clinically until resolution of their pancreatic fluid collections without fluoroscopy using a novel electrocautery-enhanced lumen-apposing, self-expanding metal stent. There are currently limited data available regarding the safety of endoscopic ultrasound (EUS)-guided drainage of pancreatic fluid collections Technical success (successful placement of EC-LAMS), number of patients who achieved complete resolution of pancreatic fluid collections without fluoroscopy using a novel electrocautery-enhanced lumen-apposing, self-expanding metal stent. There are currently limited data available regarding the safety of endoscopic ultrasound (EUS)-guided drainage of pancreatic fluid collections without additional intervention and adverse events were noted. We evaluated 25 patients, including three with pancreatic pseudocysts and 22 with walled-off necrosis (WON). The etiology of the patient's pancreatitis was gallstones (42%), alcohol (27%), and other causes (31%). The mean cyst size was 82 mm (range, 60-170 mm). The indications for endoscopic drainage were abdominal pain, infected WON, or gastric outlet obstruction. Technical success with placement of the EC-LAMS was achieved in all 25 patients. There were no procedure-related complications. The mean patient follow-up was 7.8 months. PFCs resolved in 24 (96%) patients; the one failure was in a patient with WON. Stent occlusion was seen in one patient. There was a spontaneous migration of one stent into the enteral lumen after resolution of WONs. The EC-LAMS were successfully removed using a snare in all the remaining patients. The median number of endoscopy sessions to achieve PFCs resolution was 2 (range, 2-6). Single-step EUS-guided drainage of PFCs without fluoroscopic guidance using the novel EC-LAMS is a safe and effective endoscopic technique for drainage of PFCs with excellent technical and clinical success rates and no complications. Due to its ease of use, EC-LAMS may simplify and streamline EUS-guided management of PFC and help in its widespread adoption as an alternative to surgery.
 """
 
 l = []
@@ -37,6 +38,7 @@ def switchAccs(para): # acronyms are used a lot in medical articles, so we have 
              firstChar = st[i][st[i].index("(")+1]
              acronym = st[i][st[i].index("(")+1:st[i].index(")")]
              acronym = singularize(acronym)
+            #  print(acronym)
              if(acronym != None):
                  for j in range(i):
                      word = st[i-j].lower()
@@ -46,7 +48,14 @@ def switchAccs(para): # acronyms are used a lot in medical articles, so we have 
     if(len(acc_to_full_word) > 0):
         for i in range(len(st)):
             if(i < len(st) and acc_to_full_word.get(st[i].replace(".", "")) != None):
-                st[i:i+1] = acc_to_full_word.get(singularize(st[i].replace(".", "")))
+                try:
+                    st[i:i+1] = acc_to_full_word.get((st[i].replace(".", "")))
+                except TypeError:
+                    # print(st)
+                    print("acronym", st[i])
+                    print(singularize(st[i]))
+                    print(acc_to_full_word.get(singularize(st[i])))
+                    print("Error: ",st[i]," and ", st[i:i+1])
     return " ".join(st)
 
 def is_digit(word):
@@ -78,7 +87,7 @@ class RAKE:
                 words[w] = re.sub(r'_u\d_v\d', '_u%d_v%d', words[w])
             phrase = []
             for word in words:
-                if word == "|" or nltk.tag.pos_tag([word])[0][1] == ('IN') or word.endswith("ing") :
+                if word == "|" or nltk.tag.pos_tag([word])[0][1] == ('IN') or word.endswith("ing") or word.endswith("ed"):
                     if len(phrase) >= lower and len(phrase) <= upper :
                         if nltk.tag.pos_tag(phrase[-1])[0][1].startswith('R'):
                             phrase.pop()
@@ -105,7 +114,7 @@ class RAKE:
                 word_freq.update([word])
                 word_weight[word] += weight
         for word in list(word_freq.keys()):
-            word_weight[word] = word_weight[word] + 1.5 * word_freq[word] # Frequency > Complexity
+            word_weight[word] = word_weight[word] + 1.7 * word_freq[word] # Frequency > Complexity
         word_weights = {}
         for word in list(word_freq.keys()):
             word_weights[word] = word_weight[word] / word_freq[word]

@@ -153,6 +153,7 @@
   <script>window.jQuery || document.write('<script src="js/vendor/jquery.min.js"><\/script>')</script>
   <script src="js/bootstrap.min.js"></script>
   <!-- javascript urlParams -->
+  <script type="text/javascript" src="js/firebase.js"></script>
   <script type="text/javascript">
     var socket = io();
     var urlParams = new URLSearchParams(window.location.search);
@@ -172,7 +173,7 @@
     }
     socket.io.reconnect();
     socket.emit('topic', {topic:s.toLowerCase()});
-    socket.on("sendArticles", function(data){
+    socket.on("articles", function(data){
       console.log("xd");
       var myDiv = document.getElementById("topPhrases");
 

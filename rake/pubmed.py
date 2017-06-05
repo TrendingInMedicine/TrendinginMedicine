@@ -94,7 +94,7 @@ def getKeyWords():
     print(str(len(idlist)-junk) + " articles found.")
     phrase_to_journal = OrderedDict(sorted(phrase_to_journal.items(),key=lambda t: len(t[1]), reverse=True))
     return phrase_to_journal
-    
+
 def storeInDatabase():
     countten = 0
     counter = 0
@@ -104,7 +104,7 @@ def storeInDatabase():
         for j in titles:
             if i in j:
                counter +=1
-        fb.put(topic, str(countten+1), [str(i)] + list(keyWords[i]))
+        fb.put(topic, str(countten+1), [str(i)] + list(phrase_to_journal[i]))
         print(i, len(phrase_to_journal[i]))
         articles = list(phrase_to_journal[i])
         # for j in range(len(articles)):

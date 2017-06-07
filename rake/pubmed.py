@@ -35,6 +35,7 @@ def getKeyWords():
     global phrase_to_journal, idlist, searchURL, date, count, output, junk
     silly_var = 0
     junk = 0
+    t1 = time.time()
     for i in l:
         boshal = i.split(' ')
         journal = "&term=" + s.join(boshal)
@@ -44,6 +45,7 @@ def getKeyWords():
             return
         jsonobj = json.loads(r.text)
         idlist += jsonobj["esearchresult"]["idlist"]
+    t2 = time.time()
     searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed"
     for i in idlist:
         id_number = "&id=" + str(i)
@@ -62,6 +64,7 @@ def getKeyWords():
         pubdate = jsonobj["result"][str(i)]["pubdate"]
         articleinfo = authors + title + " " + journalname + ". " + pubdate + ". " + "https://www.ncbi.nlm.nih.gov/pubmed/?term=" + str(i)
         #abstract stuff
+        t1 = time.time()
         abstractXML = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract" + id_number
         response = requests.get(abstractXML, stream=True)
         response.raw.decode_content = True
@@ -73,7 +76,10 @@ def getKeyWords():
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             # print(abstractText)
+            t1 = time.time()
             rakePhrases = rake.extract(title + abstractText, 1, 4)
+            t2 = time.time()
+            print(t2-t1)
 
             # print(abstractText + "\n")
             # print("rakePhrases: ", rakePhrases)

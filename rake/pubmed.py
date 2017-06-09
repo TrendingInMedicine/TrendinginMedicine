@@ -105,7 +105,7 @@ def storeInDatabase():
     countten = 0
     counter = 0
     for i in phrase_to_journal.keys():
-        if countten == 30:
+        if countten == 15:
             break
         for j in titles:
             if i in j:

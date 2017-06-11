@@ -72,14 +72,14 @@ def getKeyWords():
         abstractText = ""
         silly_var = silly_var + 1
         for event, elem in events:
-            if(elem.tag == "AbstractText"):
+            if(elem.tag == "AbstractText") and elem.text != None:
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             # print(abstractText)
             t1 = time.time()
             rakePhrases = rake.extract(title + abstractText, 1, 4)
             t2 = time.time()
-            print(t2-t1)
+            # print(t2-t1)
 
             # print(abstractText + "\n")
             # print("rakePhrases: ", rakePhrases)

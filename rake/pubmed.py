@@ -129,10 +129,12 @@ def storeInDatabase():
             if i in j:
                counter +=1
         # fb.put(topic, str(countten+1), [str(i)] + list(phrase_to_journal[i]))
+        print(i)
         for k in phrase_to_journal[i]:
-            curs.execute("INSERT INTO topPhrases VALUES ("+i+","+k+")")
+            print("\t" + str(k))
+            curs.execute("INSERT INTO topPhrases VALUES (\'" + str(i) + "\',\'" + str(k) + "\')")
 
-        print(i, len(phrase_to_journal[i]))
+        # print(i, len(phrase_to_journal[i]))
         articles = list(phrase_to_journal[i])
         # for j in range(len(articles)):
         #     print(str(j) + "\t" + str(articles[j]))

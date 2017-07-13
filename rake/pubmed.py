@@ -4,14 +4,16 @@ import collections
 import string
 import nltk
 import time
+import sqlite3
+import datetime
 from collections import OrderedDict
-from firebase import firebase
+# from firebase import firebase
 from nltk.corpus import stopwords
 import xml.etree.ElementTree as ET
 import rake_nltk as rn
 import operator
 
-fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
+# fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
 rake = rn.RAKE()
 
 journals = set()
@@ -22,12 +24,28 @@ s = "+"
 topic = 'surgery'
 #topic = 'cardiology'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
+
+now = datetime.datetime.now()
+m = now.month - 3
+month = ""
+if m < 10:
+    month = '0' + str(m)
+else:
+    month = str(m)
+
+year = str(now.year)
+
 l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]",'The American journal of surgical pathology', 'Annals of surgical oncology', 'Surgical endoscopy', 'Microsurgery', 'Journal of surgical oncology', 'European journal of surgical oncology : the journal of the European Society of Surgical Oncology and the British Association of Surgical Oncology', 'Surgical oncology clinics of North America', 'Seminars in pediatric surgery', 'Surgical infections', 'World journal of emergency surgery : WJES', 'World journal of surgical oncology', 'Minimally invasive surgery', 'ANZ journal of surgery', 'Pediatric surgery international', 'International journal of surgical pathology']
 print(str(len(l)) + " journals searched for")
 searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
-date = "&datetype=pdat&mindate=2017/03/01&maxdate=2017/03/31"
+date = "&datetype=pdat&mindate="+year+"/"+month+"/01&maxdate="+year+"/"+month+"/31"
 count = "&retmax=10000"
 output = "&retmode=json"
+
+sqlTableName = topic + month +'-'+ year
+conn = sqlite3.connect(sqlTableName + '.db')
+curs = conn.cursor()
+curs.execute('''CREATE TABLE topPhrases (phrase text, article text)''')
 
 phrase_to_journal = dict()
 
@@ -79,7 +97,7 @@ def getKeyWords():
             t1 = time.time()
             rakePhrases = rake.extract(title + abstractText, 1, 4)
             t2 = time.time()
-            print(t2-t1)
+            # print(t2-t1)
 
             # print(abstractText + "\n")
             # print("rakePhrases: ", rakePhrases)
@@ -110,7 +128,10 @@ def storeInDatabase():
         for j in titles:
             if i in j:
                counter +=1
-        fb.put(topic, str(countten+1), [str(i)] + list(phrase_to_journal[i]))
+        # fb.put(topic, str(countten+1), [str(i)] + list(phrase_to_journal[i]))
+        for k in phrase_to_journal[i]:
+            curs.execute("INSERT INTO topPhrases VALUES ("+i+","+k+")")
+
         print(i, len(phrase_to_journal[i]))
         articles = list(phrase_to_journal[i])
         # for j in range(len(articles)):
@@ -118,8 +139,12 @@ def storeInDatabase():
         countten+=1
         counter = 0
 
+
+
 t1 = time.time()
 getKeyWords()
 storeInDatabase()
 t2 = time.time()
 print(t2-t1)
+conn.commit()
+conn.close()

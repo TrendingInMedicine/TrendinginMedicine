@@ -90,7 +90,7 @@ def getKeyWords():
         abstractText = ""
         silly_var = silly_var + 1
         for event, elem in events:
-            if(elem.tag == "AbstractText"):
+            if(elem.tag == "AbstractText") and elem.text != None:
                 abstractText = abstractText + elem.text
         if(len(abstractText) != 0):
             # print(abstractText)

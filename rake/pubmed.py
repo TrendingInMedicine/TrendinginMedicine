@@ -132,7 +132,10 @@ def storeInDatabase():
         print(i)
         for k in phrase_to_journal[i]:
             print("\t" + str(k))
-            curs.execute("INSERT INTO topPhrases VALUES (\'" + str(i) + "\',\'" + str(k) + "\')")
+            try:
+                curs.execute("INSERT INTO topPhrases VALUES (\'" + str(i) + "\',\'" + str(k) + "\')")
+            except OperationalError:
+                print("Error!", i, k)
 
         # print(i, len(phrase_to_journal[i]))
         articles = list(phrase_to_journal[i])

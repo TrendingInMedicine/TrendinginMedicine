@@ -129,10 +129,10 @@ def storeInDatabase():
             if i in j:
                counter +=1
         # fb.put(topic, str(countten+1), [str(i)] + list(phrase_to_journal[i]))
-        print("\n"+i)
+        # print("\n"+i)
         for k in phrase_to_journal[i]:
             try:
-                print("\t" + str(k))
+                # print("\t" + str(k))
                 curs.execute("INSERT INTO topPhrases VALUES (\'" + str(i) + "\',\'" + str(k) + "\')")
             except sqlite3.OperationalError:
                 print("Error!", i, k)

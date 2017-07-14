@@ -26,7 +26,7 @@ topic = 'surgery'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
 
 now = datetime.datetime.now()
-m = now.month - 2
+m = now.month
 month = ""
 if m < 10:
     month = '0' + str(m)

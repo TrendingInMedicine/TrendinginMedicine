@@ -9,13 +9,10 @@
   <meta name="description" content="">
   <meta name="author" content="">
   <link rel="icon" href="favicon.ico">
-
   <title>Loading...</title>
-
   <!-- Bootstrap core CSS -->
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
-
   <!--Stylesheet for logins-->
   <link href="css/stylesheet.css" rel="stylesheet">
   <!-- link for css font Ubuntu is good and so is Roboto -->
@@ -75,9 +72,7 @@
       </div>
 
     </nav>
-
     <!-- Login/Signup Modal -->
-
     <div class="modal fade login" id="loginModal">
       <div class="modal-dialog login animated">
         <div class="modal-content">
@@ -130,15 +125,12 @@
   </div>
   <div class = "container" style = "margin-top:90px; margin-bottom:100px;">
     <div id = "boshal">
-
     </div>
     <div id="topPhrases" style="">
-
     </div>
     <ul>
       {{words}}
     </ul>
-
     <hr>
     <footer>
       <p>&copy; 2017 TrendinginMedicine.</p>
@@ -226,45 +218,6 @@
         }
       }
     }
-    // function displayArticles(){
-    //   console.log("xd");
-    //   var myDiv = document.getElementById("topPhrases");
-    //   console.log(data.articles);
-    //   for (var i = 0; i < data.articles.length; i++) {
-    //     var temp = data.articles[i].split(" ");
-    //     if (temp.length <= 4 ){
-    //       var term = document.createElement("h3");
-    //       console.log(term);
-    //       var t = document.createTextNode(data.articles[i]);
-    //       term.appendChild(t);
-    //       myDiv.appendChild(term);
-    //       var j = 0;
-    //     }
-    //     else{
-    //       var article = document.createElement("a");
-    //       var ref  = data.articles[i].substring(data.articles[i].indexOf("https:"), data.articles[i].length);
-    //       // console.log(ref);
-    //       article.setAttribute('href', ref);
-    //       var t = document.createTextNode(data.articles[i]);
-    //       article.appendChild(t);
-    //       if (j <= 4){
-    //         myDiv.appendChild(article);
-    //         myDiv.appendChild(document.createElement("br"));
-    //         myDiv.appendChild(document.createElement("br"));
-    //       }
-    //       if (j == 4){
-    //         var read = document.createElement("a");
-    //         var rt = document.createTextNode("View more");
-    //         read.style.align = "center"
-    //         read.appendChild(rt);
-    //         read.setAttribute('class', "read_more");
-    //         myDiv.appendChild(read);
-    //
-    //       }
-    //       j++;
-    //     }
-    //   }
-    // }
     document.title = "#TrendingIn" + s;
   </script>
   <!-- javascript urlParams -->

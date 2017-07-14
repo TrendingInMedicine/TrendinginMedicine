@@ -79,6 +79,6 @@ io.on("connection", function(socket){
     });
     setTimeout(function(){
       socket.emit("sendDB", {phraseToArticles:phraseToArticles});
-    }, 1000);
+    }, 325);
   });
 });

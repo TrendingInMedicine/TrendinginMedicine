@@ -154,10 +154,21 @@
   <script src="js/bootstrap.min.js"></script>
   <!-- javascript urlParams -->
   <script type="text/javascript">
+    var io = io().connect();
     var urlParams = new URLSearchParams(window.location.search);
     // console.log(urlParams.get('topic'));
-    var d = new Date();
     var s = urlParams.get('topic');
+    var database = urlParams.get('db')
+    if (database == null){
+      var d = new Date();
+      var month = d.getMonth();
+      var year = d.getFullYear();
+      if (d.getMonth() < 10) {
+        month = "0" + (month-1)
+      }
+      database = s.toLowerCase() + month + "-"  + year;
+      console.log(database);
+    }
     if (s == null) {
       s = "Medicine";
     }
@@ -168,52 +179,92 @@
       var t = document.createTextNode(s);
       h1.appendChild(t);
       myDiv.appendChild(h1);
-      var month = d.getMonth();
-      var year = d.getFullYear();
-      if (d.getMonth() < 10) {
-        month = "0" + month
-      }
-      console.log(s.toLowerCase() + month + "-"  + year);
     }
-    function displayArticles(){
-      console.log("xd");
+    io.emit("requestDB", {database:database});
+    io.on("sendDB", function(data){
+      var phraseToArticles = [];
+      for (var phrase in data.phraseToArticles) {
+          phraseToArticles.push([phrase, data.phraseToArticles[phrase]]);
+      }
+      phraseToArticles.sort(function(a, b) {
+          return b[1].length - a[1].length;
+      })
+      // console.log(phraseToArticles);
+      displayContent(phraseToArticles);
+    });
+    function displayContent(phraseToArticles){
       var myDiv = document.getElementById("topPhrases");
-      console.log(data.articles);
-      for (var i = 0; i < data.articles.length; i++) {
-        var temp = data.articles[i].split(" ");
-        if (temp.length <= 4 ){
-          var term = document.createElement("h3");
-          console.log(term);
-          var t = document.createTextNode(data.articles[i]);
-          term.appendChild(t);
-          myDiv.appendChild(term);
-          var j = 0;
-        }
-        else{
+      for (var i = 0; i < phraseToArticles.length; i++) {
+        phrase = phraseToArticles[i][0]
+        console.log(phrase);
+        var term = document.createElement("h3");
+        var t = document.createTextNode(phrase);
+        term.appendChild(t);
+        myDiv.appendChild(term);
+        articles = phraseToArticles[i][1]
+        for (var j = 0; j < articles.length; j++) {
+
           var article = document.createElement("a");
-          var ref  = data.articles[i].substring(data.articles[i].indexOf("https:"), data.articles[i].length);
+          var ref  = articles[j].substring(articles[j].indexOf("https:"), articles[j].length);
           // console.log(ref);
           article.setAttribute('href', ref);
-          var t = document.createTextNode(data.articles[i]);
+          var t = document.createTextNode(articles[j]);
           article.appendChild(t);
-          if (j <= 4){
+          if (j <= 5){
             myDiv.appendChild(article);
             myDiv.appendChild(document.createElement("br"));
             myDiv.appendChild(document.createElement("br"));
           }
-          if (j == 4){
+          if (j == 5){
             var read = document.createElement("a");
             var rt = document.createTextNode("View more");
             read.style.align = "center"
             read.appendChild(rt);
             read.setAttribute('class', "read_more");
             myDiv.appendChild(read);
-
           }
-          j++;
         }
       }
     }
+    // function displayArticles(){
+    //   console.log("xd");
+    //   var myDiv = document.getElementById("topPhrases");
+    //   console.log(data.articles);
+    //   for (var i = 0; i < data.articles.length; i++) {
+    //     var temp = data.articles[i].split(" ");
+    //     if (temp.length <= 4 ){
+    //       var term = document.createElement("h3");
+    //       console.log(term);
+    //       var t = document.createTextNode(data.articles[i]);
+    //       term.appendChild(t);
+    //       myDiv.appendChild(term);
+    //       var j = 0;
+    //     }
+    //     else{
+    //       var article = document.createElement("a");
+    //       var ref  = data.articles[i].substring(data.articles[i].indexOf("https:"), data.articles[i].length);
+    //       // console.log(ref);
+    //       article.setAttribute('href', ref);
+    //       var t = document.createTextNode(data.articles[i]);
+    //       article.appendChild(t);
+    //       if (j <= 4){
+    //         myDiv.appendChild(article);
+    //         myDiv.appendChild(document.createElement("br"));
+    //         myDiv.appendChild(document.createElement("br"));
+    //       }
+    //       if (j == 4){
+    //         var read = document.createElement("a");
+    //         var rt = document.createTextNode("View more");
+    //         read.style.align = "center"
+    //         read.appendChild(rt);
+    //         read.setAttribute('class', "read_more");
+    //         myDiv.appendChild(read);
+    //
+    //       }
+    //       j++;
+    //     }
+    //   }
+    // }
     document.title = "#TrendingIn" + s;
   </script>
   <!-- javascript urlParams -->

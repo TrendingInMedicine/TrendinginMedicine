@@ -5,6 +5,7 @@ const socketIO = require('socket.io');
 var path = require('path');
 var hb = require('handlebars');
 var exphbs = require('express-handlebars');
+var sqlite3 = require('sqlite3').verbose();
 
 const PORT = process.env.PORT || 8080;
 var app = express()
@@ -17,21 +18,20 @@ var app = express()
 .set('view engine', '.hbs')
 .get('/trends', function(req, res) {
   // res.sendFile(path.join(__dirname + '/trends.html'));
-  var db = admin.database();
-  var ref = db.ref("surgery")
-  ref.once("value")
-  .then(function(snapshot) {
-    snapshot.forEach(function(childSnapshot)
-    {
-      for(var i = 0; i < childSnapshot.val().length; i++)
-      {
-        articles.push(childSnapshot.val()[i]);
-      }
-    });
-
-    // console.log(articles)
-  });
-
+  // var db = admin.database();
+  // var ref = db.ref("surgery")
+  // ref.once("value")
+  // .then(function(snapshot) {
+  //   snapshot.forEach(function(childSnapshot)
+  //   {
+  //     for(var i = 0; i < childSnapshot.val().length; i++)
+  //     {
+  //       articles.push(childSnapshot.val()[i]);
+  //     }
+  //   });
+  //
+  //   // console.log(articles)
+  // });
   res.render('trends2', {});
 })
 .get('/register', function(req, res) {
@@ -59,37 +59,26 @@ var app = express()
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
-var admin = require("firebase-admin");
-var serviceAccount = require(__dirname + '/serviceAccountKey.json');
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://trendinginmedicine-f41fc.firebaseio.com"
-});
 
 
 const io = socketIO(app);
-var articles = [];
+
 io.on("connection", function(socket){
-  socket.on("topic", function(data){
-    articles = [];
-    fillArticles(data.topic, articles, function(){
-      console.log(articles.length);
-      socket.emit("articles", {articles:articles})
-    });
-  });
-});
-function fillArticles(topic, articles, callback){
-  var db = admin.database();
-  var ref = db.ref(topic);
-  console.log("Got topic: " + topic);
-  ref.on("value", function(snapshot) {
-    snapshot.forEach(function(childSnapshot){
-      for(var i = 0; i < childSnapshot.val().length; i++){
-        articles.push(childSnapshot.val()[i]);
+  socket.on("requestDB", function(data){
+    var phraseToArticles = {}
+    database = data.database + ".db";
+    console.log(database);
+    var db = new sqlite3.Database(database);
+    db.each("SELECT phrase, article FROM topPhrases", function(err, row) {
+      if (typeof phraseToArticles[row.phrase] == 'undefined') {
+          phraseToArticles[row.phrase] = [row.article];
+      }
+      else{
+        phraseToArticles[row.phrase].push(row.article);
       }
     });
-    callback();
-
-  })
-}
+    setTimeout(function(){
+      socket.emit("sendDB", {phraseToArticles:phraseToArticles});
+    }, 1000);
+  });
+});

@@ -35,6 +35,9 @@ var app = express()
   // });
   res.render('trends2', {});
 })
+.get('/journals', function(req, res) {
+  res.sendFile(path.join(__dirname + '/journals.html'));
+})
 .get('/register', function(req, res) {
   console.log("boshal")
   admin.auth().createUser({

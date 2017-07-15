@@ -39,38 +39,51 @@
 </head>
 <body id="page-top" data-spy="scroll">
   <!-- line 4356 -->
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/index">#TiM</a>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/index">#TiM</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-center navbar-main-collapse">
+          <ul class="nav navbar-nav navbar-center">
+            <li><a href = "#">Journals</a></li>
+            <li class = "dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#">#Trends
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="/trends?topic=surgery">Surgery</a></li>
+                  <li><a href="/trends?topic=oncology">Oncology</a></li>
+                  <li><a href="/trends?topic=cardiology">Cardiology</a></li>
+                </ul>
+              </li>
+              <li><a href = "/#learn"> Team </a></li>
+            </ul>
+            <ul class = "nav navbar-nav navbar-right">
+              <li><a href="#" data-toggle="modal" onclick="openRegisterModal();"><span class = "glyphicon glyphicon-user"></span>  Sign Up</a></li>
+              <li><a href="#" data-toggle="modal" onclick="openLoginModal();"><span class = "glyphicon glyphicon-log-in"></span>  Log In</a></li>
+            </ul>
+          </div>
       </div>
-      <div class="collapse navbar-collapse navbar-center navbar-main-collapse">
-        <ul class="nav navbar-nav navbar-center">
-          <li><a href = "#">Journals</a></li>
-          <li class = "dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#">#Trends
-              <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="/trends?topic=surgery">Surgery</a></li>
-                <li><a href="/trends?topic=oncology">Oncology</a></li>
-                <li><a href="/trends?topic=cardiology">Cardiology</a></li>
-              </ul>
-            </li>
-            <li><a href = "/#learn"> Team </a></li>
-          </ul>
-          <ul class = "nav navbar-nav navbar-right">
-            <li><a href="#" data-toggle="modal" onclick="openRegisterModal();"><span class = "glyphicon glyphicon-user"></span>  Sign Up</a></li>
-            <li><a href="#" data-toggle="modal" onclick="openLoginModal();"><span class = "glyphicon glyphicon-log-in"></span>  Log In</a></li>
-          </ul>
+      <div class="row">
+        <div class="container">
+          <div "navbar-header" style="display: block;">
+            <a id="prevMonth" href="#" class="btn btn-info btn-lg">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              Previous Month
+            </a>
+            <a id="nextMonth" href="#" class="navbar-right btn btn-info btn-lg">
+              Next Month
+              <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+          </div>
         </div>
       </div>
-
     </nav>
     <!-- Login/Signup Modal -->
     <div class="modal fade login" id="loginModal">
@@ -123,7 +136,7 @@
       </div>
     </div>
   </div>
-  <div class = "container" style = "margin-top:90px; margin-bottom:100px;">
+  <div class = "container" style = "margin-top:100px; margin-bottom:100px;">
     <div id = "boshal">
     </div>
     <div id="topPhrases" style="">
@@ -153,13 +166,66 @@
     var database = urlParams.get('db')
     if (database == null){
       var d = new Date();
-      var month = d.getMonth();
+      var month = d.getMonth() + 1;
       var year = d.getFullYear();
-      if (d.getMonth() < 10) {
-        month = "0" + (month-1)
+      if (month == 12) {
+        nextMonth = 1
+      }
+      else {
+        nextMonth = month + 1
+        if (nextMonth < 10) {
+          nextMonth = "0" + nextMonth
+        }
+      }
+      console.log(nextMonth);
+      if (month == 1) {
+        prevMonth = 12
+      }
+      else {
+        prevMonth = month - 1
+        if (prevMonth < 10) {
+          prevMonth = "0" + prevMonth
+        }
+      }
+      console.log(prevMonth);
+      if (month < 10) {
+        month = "0" + month;
       }
       database = s.toLowerCase() + month + "-"  + year;
+
+      document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + year
+      document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + year
+
       console.log(database);
+    }
+    else{
+      var month = parseInt(database.substring(database.indexOf(s) + s.length, database.indexOf("-")));
+      var year = parseInt(database.substring(database.indexOf("-") + 1));
+      if (month == 12) {
+        nextMonth = 1
+      }
+      else {
+        nextMonth = month + 1
+        if (nextMonth < 10) {
+          nextMonth = "0" + nextMonth
+        }
+      }
+      console.log(nextMonth);
+      if (month == 1) {
+        prevMonth = 12
+      }
+      else {
+        prevMonth = month - 1
+        if (prevMonth < 10) {
+          prevMonth = "0" + prevMonth
+        }
+      }
+      console.log(prevMonth);
+      document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + year
+      document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + year
+
+      console.log(month);
+      console.log(year);
     }
     if (s == null) {
       s = "Medicine";

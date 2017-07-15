@@ -6,6 +6,7 @@ var path = require('path');
 var hb = require('handlebars');
 var exphbs = require('express-handlebars');
 var sqlite3 = require('sqlite3').verbose();
+var fs = require('fs');
 
 const PORT = process.env.PORT || 8080;
 var app = express()
@@ -67,18 +68,20 @@ io.on("connection", function(socket){
   socket.on("requestDB", function(data){
     var phraseToArticles = {}
     database = data.database + ".db";
-    console.log(database);
-    var db = new sqlite3.Database(database);
-    db.each("SELECT phrase, article FROM topPhrases", function(err, row) {
-      if (typeof phraseToArticles[row.phrase] == 'undefined') {
-          phraseToArticles[row.phrase] = [row.article];
-      }
-      else{
-        phraseToArticles[row.phrase].push(row.article);
-      }
-    });
-    setTimeout(function(){
-      socket.emit("sendDB", {phraseToArticles:phraseToArticles});
-    }, 325);
+    if (fs.existsSync(database)) {
+      console.log(database);
+      var db = new sqlite3.Database(database);
+      db.each("SELECT phrase, article FROM topPhrases", function(err, row) {
+        if (typeof phraseToArticles[row.phrase] == 'undefined') {
+            phraseToArticles[row.phrase] = [row.article];
+        }
+        else{
+          phraseToArticles[row.phrase].push(row.article);
+        }
+      });
+      setTimeout(function(){
+        socket.emit("sendDB", {phraseToArticles:phraseToArticles});
+      }, 325);
+    }
   });
 });

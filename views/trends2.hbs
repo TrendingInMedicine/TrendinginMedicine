@@ -256,9 +256,14 @@
       var myDiv = document.getElementById("topPhrases");
       for (var i = 0; i < phraseToArticles.length; i++) {
         phrase = phraseToArticles[i][0];
-        phrase = phrase.replace(/\s/g, '');
+        var str = phrase.split(" ");
+        console.log(str);
+        for(var k = 0; k < str.length; k++)
+        {
+          str[k] = str[k].charAt(0).toUpperCase() + str[k].substring(1);
+        }
+        phrase = str.join("");
         phrase = "#" + phrase;
-        console.log(phrase);
         var term = document.createElement("h3");
         var t = document.createTextNode(phrase);
         term.appendChild(t);

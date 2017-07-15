@@ -72,6 +72,7 @@
       </div>
       <div class="row">
         <div class="container">
+          <!-- <p id="month" class="navbar-center">June</p> -->
           <div "navbar-header" style="display: block;">
             <a id="prevMonth" href="#" class="btn btn-info btn-lg">
               <span class="glyphicon glyphicon-chevron-left"></span>
@@ -160,6 +161,7 @@
   <!-- javascript urlParams -->
   <script type="text/javascript">
     var io = io().connect();
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     var urlParams = new URLSearchParams(window.location.search);
     // console.log(urlParams.get('topic'));
     var s = urlParams.get('topic');
@@ -231,7 +233,7 @@
       s = "Medicine";
     }
     else {
-      var s = s[0].toUpperCase() + s.slice(1);
+      var s = s[0].toUpperCase() + s.slice(1) + " - " + months[month-1];
       var myDiv = document.getElementById('boshal');
       var h1 = document.createElement("h1");
       var t = document.createTextNode(s);

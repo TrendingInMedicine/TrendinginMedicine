@@ -255,7 +255,9 @@
     function displayContent(phraseToArticles){
       var myDiv = document.getElementById("topPhrases");
       for (var i = 0; i < phraseToArticles.length; i++) {
-        phrase = phraseToArticles[i][0]
+        phrase = phraseToArticles[i][0];
+        phrase = phrase.replace(/\s/g, '');
+        phrase = "#" + phrase;
         console.log(phrase);
         var term = document.createElement("h3");
         var t = document.createTextNode(phrase);

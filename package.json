@@ -10,13 +10,13 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "4.13.3",
+    "express": "^4.13.3",
     "firebase": "^3.7.4",
     "firebase-admin": "^4.1.4",
-    "handlebars": "^4.0.6",
+    "handlebars": "^4.0.10",
     "http": "0.0.0",
     "socket.io": "2.0.1",
-    "sqlite3":"3.1.8"
+    "sqlite3": "3.1.8"
   },
   "keywords": [
     "node",

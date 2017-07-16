@@ -1,2 +1,2 @@
-# TrendinginMedicine 2.0
-Source code for the redesigned version of the TrendingInMedicine website.
+# TrendinginMedicine
+Source code for the release version of the #TrendingInMedicine website.

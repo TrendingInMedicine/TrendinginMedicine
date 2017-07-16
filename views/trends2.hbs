@@ -71,7 +71,7 @@
               <li><a href="#" data-toggle="modal" onclick="openLoginModal();"><span class = "glyphicon glyphicon-log-in"></span>  Log In</a></li>
             -->
             <!-- Temporary Login Buttons: -->
-            
+
             <li><a href="#" data-toggle="modal"><span class = "glyphicon glyphicon-user"></span>  Sign Up</a></li>
             <li><a href="#" data-toggle="modal"><span class = "glyphicon glyphicon-log-in"></span>  Log In</a></li>
             </ul>
@@ -176,9 +176,11 @@
     if (database == null){
       var d = new Date();
       var month = d.getMonth() + 1;
-      var year = d.getFullYear();
+      var year =prevYear= d.getFullYear();
       if (month == 12) {
         nextMonth = 1
+        nextYear = year + 1
+
       }
       else {
         nextMonth = month + 1
@@ -189,6 +191,8 @@
       console.log(nextMonth);
       if (month == 1) {
         prevMonth = 12
+        prevYear = year - 1
+
       }
       else {
         prevMonth = month - 1
@@ -202,16 +206,18 @@
       }
       database = s.toLowerCase() + month + "-"  + year;
 
-      document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + year
-      document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + year
+      document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + prevYear
+      // document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + year
 
       console.log(database);
     }
     else{
       var month = parseInt(database.substring(database.indexOf(s) + s.length, database.indexOf("-")));
       var year = parseInt(database.substring(database.indexOf("-") + 1));
+      var nextYear = prevYear = year
       if (month == 12) {
         nextMonth = 1
+        nextYear = nextYear + 1
       }
       else {
         nextMonth = month + 1
@@ -222,6 +228,7 @@
       console.log(nextMonth);
       if (month == 1) {
         prevMonth = 12
+        prevYear = prevYear - 1
       }
       else {
         prevMonth = month - 1
@@ -229,9 +236,22 @@
           prevMonth = "0" + prevMonth
         }
       }
+      var d = new Date();
       console.log(prevMonth);
-      document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + year
-      document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + year
+      if (prevMonth+"-"+prevYear !="12-2016") {
+        document.getElementById("prevMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + prevMonth + "-"  + prevYear
+      }
+
+      thisMonth = d.getMonth() + 2
+      if (thisMonth < 10) {
+        thisMonth = "0" + thisMonth
+      }
+      console.log(thisMonth + "-" + d.getFullYear());
+      console.log(nextMonth + "-"  + nextYear);
+
+      if (thisMonth + "-" + d.getFullYear() != nextMonth + "-"  + nextYear ) {
+        document.getElementById("nextMonth").href = "/trends?topic=" + s.toLowerCase() +"&db=" + s.toLowerCase() + nextMonth + "-"  + nextYear
+      }
 
       console.log(month);
       console.log(year);
@@ -240,10 +260,10 @@
       s = "Medicine";
     }
     else {
-      var s = s[0].toUpperCase() + s.slice(1) + " - " + months[month-1];
+      var s = s[0].toUpperCase() + s.slice(1);
       var myDiv = document.getElementById('boshal');
       var h1 = document.createElement("h1");
-      var t = document.createTextNode(s);
+      var t = document.createTextNode(s +" - "+months[month-1] +" "+ year);
       h1.appendChild(t);
       myDiv.appendChild(h1);
     }

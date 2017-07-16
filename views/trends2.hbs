@@ -14,8 +14,9 @@
   <link href="css/bootstrap.css" rel="stylesheet">
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
   <!--Stylesheet for logins-->
-  <link href="css/stylesheet.css" rel="stylesheet">
   <!-- link for css font Ubuntu is good and so is Roboto -->
+  <link href="css/stylesheet.css" rel="stylesheet">
+
   <link href='https://fonts.googleapis.com/css?family=Roboto:light' rel='stylesheet' type='text/css'>
   <style>
     body{
@@ -34,8 +35,7 @@
   <script src="js/login_register.js" type="text/javascript"></script>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
-  <script type="text/javascript">
-  </script>
+
 </head>
 <body id="page-top" data-spy="scroll">
   <!-- line 4356 -->
@@ -80,7 +80,7 @@
       <div class="row">
         <div class="container">
           <!-- <p id="month" class="navbar-center">June</p> -->
-          <div "navbar-header" style="display: block;">
+          <div class="navbar-center" style="display: block;">
             <a id="prevMonth" href="#" class="btn btn-info btn-lg">
               <span class="glyphicon glyphicon-chevron-left"></span>
               Previous Month
@@ -285,8 +285,7 @@
         phrase = phraseToArticles[i][0];
         var str = phrase.split(" ");
         console.log(str);
-        for(var k = 0; k < str.length; k++)
-        {
+        for(var k = 0; k < str.length; k++){
           str[k] = str[k].charAt(0).toUpperCase() + str[k].substring(1);
         }
         phrase = str.join("");
@@ -309,13 +308,24 @@
             myDiv.appendChild(document.createElement("br"));
             myDiv.appendChild(document.createElement("br"));
           }
-          if (j == 5){
-            var read = document.createElement("a");
+          if (j == 6){
+
+            var read = document.createElement("div");
+            var viewMoreP = document.createElement("h4");
             var rt = document.createTextNode("View more");
-            read.style.align = "center"
-            read.appendChild(rt);
+            viewMoreP.style.textAlign = "center"
+            viewMoreP.appendChild(rt);
+            read.appendChild(viewMoreP)
+            read.id = "viewMore" + i
             read.setAttribute('class', "read_more");
+            read.appendChild(document.createElement("br"));
+
             myDiv.appendChild(read);
+          }
+          if (j > 5) {
+            article.appendChild(document.createElement("br"));
+            article.appendChild(document.createElement("br"));
+            document.getElementById("viewMore" + i).appendChild(article);
           }
         }
       }

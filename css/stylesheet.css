@@ -371,3 +371,7 @@ body {
 #myUL li a:hover:not(.header) {
   background-color: #eee;
 }
+.read_more a {display: none;}
+.read_more:hover a {
+  display: block;
+}

@@ -4,41 +4,81 @@ import collections
 import string
 import nltk
 import time
+import sqlite3
+import datetime
 from collections import OrderedDict
-from firebase import firebase
 from nltk.corpus import stopwords
+import xml.etree.ElementTree as ET
+import rake_nltk as rn
+import operator
 
-fb = firebase.FirebaseApplication("https://trendinginmedicine-f41fc.firebaseio.com/")
+rake = rn.RAKE()
+
 journals = set()
-keyWords = dict()
 translator = str.maketrans('', '', string.punctuation)
-commonWords = stopwords.words('english') + ['review', "surgery", "report", "peer", "patients", "systematic", "surgical", "management", "meta-analysis", "versus", "total", "factors", "controlled", "repair", "cancer", "randomized", "study", "outcomes", "reconstruction", "safety", "open", "analysis", 'metaanalysis', '“comparison', '“the', 'study”', "cancer:", "clinical", "case", "oral", "treatment", "chapter", "—", "using", "cell", "cases", "head", "evaluation", "literature", "neck", "patient", "technique", "retrospective", "flap", "facial", "experience", "use", "following", "approach", "comparison", "syndrome", "threedimensional", "disease", "bone", "joint", "implants", "postoperative", "postoperative", "rare", "effect", "outcome", "dental", "artery", "carcinoma","risk", "associated", 'therapy', 'acute', 'lower', "maxillary", 'resection', 'bypass', "vascular", "longterm", "graft", "cohort", "transplantation", "preoperative", "prospective", "injury", "mortality", "care", "extremity", "discussion", "trial", "primary", "impact", "quality", "complications", "surgeons", "undergoing", "intraoperative", "research", "volume", "hospital", "survival", "improves", "role", "results", "prognosis", "prognostic", "control", "lung", "function", "centers", "center", "multicenter", "heart", "association", "coronary", "cardiovascular", "failure", "american", "valve", "atrial", "cardiac", "left", "pulmonary", "fibrillation", "pressure", "perceutaneous", "aortic", "infaraction", "blood", "chronic", "college", "stroke", "reply", "events", "guidelines", "women", "mitral", "data", "trials", "laparoscopic", "breast", "general", "model", "early", "invasive", "novel", "value", "time", "training", "score", "medical", "single", "portal", "development", "years", "emergency", "recovery"]
 idlist = []
 titles = []
 s = "+"
 topic = 'surgery'
+#topic = 'cardiology'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
-l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]"]
+
+now = datetime.datetime.now()
+m = now.month - 6
+month = ""
+
+if m < 10:
+    month = '0' + str(m)
+else:
+    month = str(m)
+
+year = str(now.year)
+
+l = ["JAMA surgery[ta]", "World journal of surgery[ta]", "American journal of surgery[ta]", "The Surgical clinics of North America[ta]", "The Journal of surgical research[ta]", "Journal of surgical education[ta]", "Adv Surg[ta]", "European surgical research[ta]", "\"The Journal of the International College of Surgeons\"[ta]", "Journal of the American College of Surgeons[ta]", "\"Bulletin of the American College of Surgeons\"[ta]", "\"Surgery\"[ta]", "International journal of surgery[ta]", "\"The European journal of surgery\"[ta]", "Surgery today[ta]", "Annals of surgery[ta]", "The British journal of surgery[ta]", "The American surgeon[ta]", "\"International journal of surgery and research\"[ta]", "\"Canadian journal of surgery\"[ta]", "\"Current problems in surgery\"[ta]", "Scandinavian journal of surgery[ta]", "Surgical innovation[ta]", "\"Annals of surgical innovation and research\"[ta]", "Updates in surgery[ta]", "Annals of surgical treatment and research[ta]", "Asian journal of surgery[ta]", "\"Southeast Asian journal of surgery\"[ta]", "Journal of investigative surgery[ta]", "Annals of the Royal College of Surgeons of England[ta]", "\"International surgery\"[ta]", "Indian J Surg[ta]",'The American journal of surgical pathology', 'Annals of surgical oncology', 'Surgical endoscopy', 'Microsurgery', 'Journal of surgical oncology', 'European journal of surgical oncology : the journal of the European Society of Surgical Oncology and the British Association of Surgical Oncology', 'Surgical oncology clinics of North America', 'Seminars in pediatric surgery', 'Surgical infections', 'World journal of emergency surgery : WJES', 'World journal of surgical oncology', 'Minimally invasive surgery', 'ANZ journal of surgery', 'Pediatric surgery international', 'International journal of surgical pathology']
+
 print(str(len(l)) + " journals searched for")
+
 searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed"
-date = "&datetype=pdat&mindate=2017/03/01&maxdate=2017/03/31"
+date = "&datetype=pdat&mindate="+year+"/"+month+"/01&maxdate="+year+"/"+month+"/31"
 count = "&retmax=10000"
 output = "&retmode=json"
 
+sqlTableName = topic + month +'-'+ year
+conn = sqlite3.connect(sqlTableName + '.db')
+curs = conn.cursor()
+
+build = False
+
+try:
+    curs.execute('''CREATE TABLE topPhrases (phrase text, article text)''')
+except sqlite3.OperationalError:
+    build = True
+
+connglobalTable = sqlite3.connect('global'+topic.title()+'.db')
+curs_g = connglobalTable.cursor()
+
+phrase_to_journal = dict()
+
 def getKeyWords():
-    global keyWords, idlist, searchURL, date, count, output
+    global phrase_to_journal, idlist, searchURL, date, count, output, junk
+    silly_var = 0
+    junk = 0
+    t1 = time.time()
     for i in l:
         boshal = i.split(' ')
         journal = "&term=" + s.join(boshal)
         r = requests.get(searchURL + journal + date + count + output)
+        if r.text == None:
+            r.text = ""
+            return
         jsonobj = json.loads(r.text)
         idlist += jsonobj["esearchresult"]["idlist"]
-    print(str(len(idlist)) + " articles found")
+    t2 = time.time()
     searchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed"
     for i in idlist:
-        journal = "&id=" + str(i)
+        id_number = "&id=" + str(i)
         output = "&retmode=json&rettype=json"
-        r = requests.get(searchURL + journal + output)
+        r = requests.get(searchURL + id_number + output)
         jsonobj = json.loads(r.text)
         title = jsonobj["result"][str(i)]["title"]
         journalname = jsonobj["result"][str(i)]["source"]
@@ -51,45 +91,66 @@ def getKeyWords():
         #print(journalname)
         pubdate = jsonobj["result"][str(i)]["pubdate"]
         articleinfo = authors + title + " " + journalname + ". " + pubdate + ". " + "https://www.ncbi.nlm.nih.gov/pubmed/?term=" + str(i)
-        titles.append(title)
-        for word in title.split():
-            word = word.lower()
-            word = word.translate(translator)
-            if word not in commonWords and len(word) > 3:
-                if word in keyWords:
-                    alist = keyWords[word]
-                    alist.add(articleinfo)
-                else:
-                    tempset = set()
-                    tempset.add(articleinfo)
-                    keyWords[word] = tempset
-    keyWords = OrderedDict(sorted(keyWords.items(),key=lambda t: len(t[1]), reverse=True))
-    print(str(len(journals)) + " journals found")
-    return keyWords
+        #abstract stuff
+        t1 = time.time()
+        abstractXML = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract" + id_number
+        response = requests.get(abstractXML, stream=True)
+        response.raw.decode_content = True
+        events = ET.iterparse(response.raw)
+        abstractText = ""
+        silly_var = silly_var + 1
+        for event, elem in events:
+            if(elem.tag == "AbstractText") and elem.text != None:
+                abstractText = abstractText + elem.text
+        if(len(abstractText) != 0):
+            t1 = time.time()
+            rakePhrases = rake.extract(title + abstractText, 1, 4)
+            t2 = time.time()
+
+            rakePhrases = dict(rakePhrases)
+
+            for phrase in rakePhrases:
+                if rakePhrases[phrase] >= 10:
+                    if phrase in phrase_to_journal:
+                        alist = phrase_to_journal[phrase]
+                        alist.add(articleinfo)
+                    else:
+                        tempset = set()
+                        tempset.add(articleinfo)
+                        phrase_to_journal[phrase] = tempset
+        else:
+            junk = junk + 1
+    print(str(len(idlist)-junk) + " articles found.")
+    phrase_to_journal = OrderedDict(sorted(phrase_to_journal.items(),key=lambda t: len(t[1]), reverse=True))
+    return phrase_to_journal
 
 def storeInDatabase():
-    countten = 0
-    counter = 0
-    for i in keyWords.keys():
-        if countten == 30:
-            break
-        print(i)
-        for j in titles:
-            if i in j:
-               counter +=1
-        #fb.put(topic, str(countten+1), [str(i)] + list(keyWords[i]))
-        print(len(keyWords[i]))
-        articles = list(keyWords[i])
-        # for j in range(len(articles)):
-        #     print(str(j) + "\t" + str(articles[j]))
-        countten+=1
-        print(counter)
-        counter = 0
+    count = 0
+    for i in phrase_to_journal.keys():
+        try:
+            curs_g.execute('''CREATE TABLE ''' + i + '-' + topic + ''' (date text, freq text''')
+        except sqlite3.OperationalError:
+            xd = 0
+        date1 = month + "-" + year
+        curs_g.execute("INSERT INTO "+ i + '-' + topic + " VALUES (" + date1 + "," + len(phrase_to_journal[i]) + ")")
+        print(i + '-' + topic, date1, len(phrase_to_journal[i]))
+
+        if count < 15 and not build:
+            for k in phrase_to_journal[i]:
+                try:
+                    # print("\t" + str(k))
+                    k = k.replace('\'','’')
+                    curs.execute("INSERT INTO topPhrases VALUES (\'" + str(i) + "\',\'" + str(k) + "\')")
+                except sqlite3.OperationalError:
+                    print("Error!", i, k)
+
+        articles = list(phrase_to_journal[i])
+        count+=1
 
 t1 = time.time()
 getKeyWords()
 storeInDatabase()
 t2 = time.time()
 print(t2-t1)
-# result = fb.get('surgery', '3 abdominal')
-# print(result)
+conn.commit()
+conn.close()

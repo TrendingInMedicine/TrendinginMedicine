@@ -71,9 +71,9 @@ io.on("connection", function(socket){
   socket.on("requestDB", function(data){
     var phraseToArticles = {}
     database = data.database + ".db";
-    if (fs.existsSync("rake/" + database)) {
+    if (fs.existsSync("rake/database/" + database)) {
       console.log(database);
-      var db = new sqlite3.Database("rake/"+ database);
+      var db = new sqlite3.Database("rake/database/"+ database);
       db.each("SELECT phrase, article FROM topPhrases", function(err, row) {
         if (typeof phraseToArticles[row.phrase] == 'undefined') {
             phraseToArticles[row.phrase] = [row.article];

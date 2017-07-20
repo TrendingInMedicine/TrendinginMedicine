@@ -44,7 +44,7 @@ count = "&retmax=10000"
 output = "&retmode=json"
 
 sqlTableName = topic + month +'-'+ year
-conn = sqlite3.connect(sqlTableName + '.db')
+conn = sqlite3.connect("database/" + sqlTableName + '.db')
 curs = conn.cursor()
 
 build = False
@@ -54,7 +54,7 @@ try:
 except sqlite3.OperationalError:
     build = True
 
-connglobalTable = sqlite3.connect('global'+topic.title()+'.db')
+connglobalTable = sqlite3.connect("database/global"+topic.title()+'.db')
 curs_g = connglobalTable.cursor()
 
 phrase_to_journal = dict()

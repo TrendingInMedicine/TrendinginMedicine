@@ -24,7 +24,7 @@ topic = 'surgery'
 #l = ["Journal of the American College of Cardiology[ta]", "JACC. Heart failure[ta]", "JACC. Cardiovascular interventions[ta]", "Chest[ta]", "American heart journal[ta]", "Journal of the American Heart Association[ta]", "\"European heart journal\"[ta]"]
 
 now = datetime.datetime.now()
-m = now.month - 6
+m = now.month - 1
 month = ""
 
 if m < 10:
@@ -132,8 +132,12 @@ def storeInDatabase():
         except sqlite3.OperationalError:
             xd = 0
         date1 = month + "-" + year
-        curs_g.execute("INSERT INTO "+ i + '-' + topic + " VALUES (" + date1 + "," + len(phrase_to_journal[i]) + ")")
-        print(i + '-' + topic, date1, len(phrase_to_journal[i]))
+        i = i.replace('\'','')
+        try:
+            tableName = i.replace(" ", "_") + "-" + topic
+            curs_g.execute("INSERT INTO "+ tableName + " VALUES (\'" + date1 + "\',\'" + str(len(phrase_to_journal[i])) + "\')")
+        except sqlite3.OperationalError:
+            print("Error!", i.replace(" ", "_") + "-" + topic , date1, len(phrase_to_journal[i]))
 
         if count < 15 and not build:
             for k in phrase_to_journal[i]:

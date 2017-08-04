@@ -175,7 +175,7 @@
     var database = urlParams.get('db')
     if (database == null){
       var d = new Date();
-      var month = d.getMonth() - 1;
+      var month = d.getMonth();
       var year =prevYear= d.getFullYear();
       if (month == 12) {
         nextMonth = 1

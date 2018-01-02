@@ -176,7 +176,11 @@
     if (database == null){
       var d = new Date();
       var month = d.getMonth();
-      var year =prevYear= d.getFullYear();
+      var year = prevYear= d.getFullYear();
+	if (month == 0){
+		month = 12
+		year = prevYear = year - 1	
+	}
       if (month == 12) {
         nextMonth = 1
         nextYear = year + 1
@@ -188,11 +192,11 @@
           nextMonth = "0" + nextMonth
         }
       }
+
       console.log(nextMonth);
       if (month == 1) {
         prevMonth = 12
         prevYear = year - 1
-
       }
       else {
         prevMonth = month - 1
@@ -200,6 +204,7 @@
           prevMonth = "0" + prevMonth
         }
       }
+
       console.log(prevMonth);
       if (month < 10) {
         month = "0" + month;
